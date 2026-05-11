@@ -1,48 +1,207 @@
-/* Colores basados en tu imagen */
-$bg-dark: #0f172a;
-$card-bg: #1e293b;
-$primary-btn: #6366f1;
+/* Variables Actualizadas: Paleta Azul Marino y Fondo Moderno */
+$bg-gradient: linear-gradient(
+    135deg,
+    #1e293b 0%,
+    #334155 100%
+); /* Fondo Slate más claro */
+$card-bg: rgba(15, 23, 42, 0.8); /* Azul muy oscuro con transparencia */
+$input-bg: #1e293b;
+$primary-blue: #1e40af; /* Azul Marino Principal */
+$primary-hover: #1d4ed8; /* Azul más vibrante para hover */
+$text-muted: #94a3b8;
+$error-color: #ef4444;
 
-.login-container {
-    background-color: $bg-dark;
+.login-wrapper {
+    background: $bg-gradient;
     height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    padding: 0;
+    margin: 0;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    position: fixed; /* Asegura que cubra toda la pantalla sin bordes */
+    top: 0;
+    left: 0;
+    overflow: hidden; /* Evita cualquier scroll accidental */
 }
 
 .login-card {
-    background-color: $card-bg;
-    padding: 2.5rem;
-    border-radius: 12px;
+    background: $card-bg;
+    backdrop-filter: blur(12px);
+    padding: 3rem 2.5rem;
+    border-radius: 1.5rem;
     width: 100%;
-    max-width: 400px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    max-width: 440px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    animation: fadeIn 0.6s ease-out;
 }
 
-button {
-    background-color: $primary-btn;
-    color: white;
-    width: 100%;
-    padding: 0.8rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 1rem;
-    &:disabled {
-        opacity: 0.5;
+.login-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+
+    .brand-icon {
+        background: linear-gradient(
+            135deg,
+            $primary-blue,
+            #3b82f6
+        ); /* Degradado Azul */
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1rem;
+        border-radius: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.4);
+    }
+
+    .brand-name {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: white;
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
+
+    .brand-subtitle {
+        color: $text-muted;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
     }
 }
 
-.form-group {
-    margin-bottom: 1rem;
-    input {
-        width: 100%;
-        padding: 0.7rem;
-        background: #334155;
-        border: 1px solid #475569;
-        color: white;
-        border-radius: 6px;
+.form-title {
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.input-group-custom {
+    margin-bottom: 1.25rem;
+
+    label {
+        display: block;
+        color: $text-muted;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        margin-left: 0.25rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            font-size: 1rem;
+            opacity: 0.6;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            background: $input-bg;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+
+            &:focus {
+                outline: none;
+                border-color: $primary-blue;
+                background: #1e293b;
+                box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.2);
+            }
+
+            &::placeholder {
+                color: #64748b;
+            }
+        }
+    }
+}
+
+.btn-login {
+    background-color: $primary-blue;
+    color: white;
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not(:disabled) {
+        background-color: $primary-hover;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.error-container {
+    background: rgba($error-color, 0.1);
+    border: 1px solid rgba($error-color, 0.2);
+    color: #fca5a5;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: $text-muted;
+
+    a {
+        color: #60a5fa; /* Azul claro para links sobre fondo oscuro */
+        text-decoration: none;
+        font-weight: 600;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

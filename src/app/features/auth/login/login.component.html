@@ -1,37 +1,63 @@
-<div class="login-container">
+<div class="login-wrapper">
     <div class="login-card">
-        <div class="logo-section text-center">
-            <div class="icon-box">📦</div>
-            <h1>WMS Intranet</h1>
-            <p>Sistema de Gestión de Almacén</p>
-        </div>
+        <header class="login-header">
+            <div class="brand-icon">
+                <span class="box-emoji">📦</span>
+            </div>
+            <h1 class="brand-name">WMS Intranet</h1>
+            <p class="brand-subtitle">Sistema de Gestión de Almacén</p>
+        </header>
 
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <h3>Iniciar Sesión</h3>
+        <form
+            [formGroup]="loginForm"
+            (ngSubmit)="onSubmit()"
+            class="login-form"
+        >
+            <h2 class="form-title">Iniciar Sesión</h2>
 
-            <div class="form-group">
-                <label>USUARIO</label>
-                <input
-                    type="text"
-                    formControlName="identifier"
-                    placeholder="admin / almacenero"
-                />
+            <div class="input-group-custom">
+                <label for="identifier">USUARIO / EMAIL</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input
+                        id="identifier"
+                        type="text"
+                        formControlName="identifier"
+                        placeholder="admin / admin@integrafabrica.com"
+                    />
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>CONTRASEÑA</label>
-                <input
-                    type="password"
-                    formControlName="password"
-                    placeholder="••••••••"
-                />
+            <div class="input-group-custom">
+                <label for="password">CONTRASEÑA</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
+                    <input
+                        id="password"
+                        type="password"
+                        formControlName="password"
+                        placeholder="••••••••"
+                    />
+                </div>
             </div>
 
-            <p *ngIf="errorMessage" class="error-text">{{ errorMessage }}</p>
+            <div class="error-container" *ngIf="errorMessage">
+                <span class="error-icon">⚠️</span> {{ errorMessage }}
+            </div>
 
-            <button type="submit" [disabled]="loginForm.invalid">
-                Ingresar al Sistema
+            <button
+                type="submit"
+                class="btn-login"
+                [disabled]="loginForm.invalid"
+            >
+                <span>Ingresar al Sistema</span>
             </button>
+
+            <footer class="form-footer">
+                <p>
+                    ¿Olvidaste tu contraseña? <a href="#">Contactar soporte</a>
+                </p>
+            </footer>
         </form>
     </div>
 </div>
