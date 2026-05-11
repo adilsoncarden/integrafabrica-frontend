@@ -1,0 +1,48 @@
+/* Colores basados en tu imagen */
+$bg-dark: #0f172a;
+$card-bg: #1e293b;
+$primary-btn: #6366f1;
+
+.login-container {
+    background-color: $bg-dark;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.login-card {
+    background-color: $card-bg;
+    padding: 2.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+button {
+    background-color: $primary-btn;
+    color: white;
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 1rem;
+    &:disabled {
+        opacity: 0.5;
+    }
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    input {
+        width: 100%;
+        padding: 0.7rem;
+        background: #334155;
+        border: 1px solid #475569;
+        color: white;
+        border-radius: 6px;
+    }
+}

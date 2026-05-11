@@ -1,0 +1,37 @@
+<div class="login-container">
+    <div class="login-card">
+        <div class="logo-section text-center">
+            <div class="icon-box">📦</div>
+            <h1>WMS Intranet</h1>
+            <p>Sistema de Gestión de Almacén</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <h3>Iniciar Sesión</h3>
+
+            <div class="form-group">
+                <label>USUARIO</label>
+                <input
+                    type="text"
+                    formControlName="identifier"
+                    placeholder="admin / almacenero"
+                />
+            </div>
+
+            <div class="form-group">
+                <label>CONTRASEÑA</label>
+                <input
+                    type="password"
+                    formControlName="password"
+                    placeholder="••••••••"
+                />
+            </div>
+
+            <p *ngIf="errorMessage" class="error-text">{{ errorMessage }}</p>
+
+            <button type="submit" [disabled]="loginForm.invalid">
+                Ingresar al Sistema
+            </button>
+        </form>
+    </div>
+</div>
