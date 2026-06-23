@@ -24,14 +24,14 @@ export class MainLayoutComponent {
     userMenuOpen = signal(false);
 
     readonly navItems: NavItem[] = [
-        { label: 'Dashboard', icon: '📊', route: '/admin/dashboard' },
-        { label: 'Categorías', icon: '🏷️', route: '/admin/categorias' },
-        { label: 'Ubicaciones', icon: '📍', route: '/admin/ubicaciones' },
-        { label: 'Proveedores', icon: '🏢', route: '/admin/proveedores' },
-        { label: 'Productos', icon: '📦', route: '/admin/productos' },
-        { label: 'Lotes', icon: '🧪', route: '/admin/lotes' },
-        { label: 'Movimientos', icon: '🔄', route: '/admin/movimientos' },
-        { label: 'Detalles Mov.', icon: '📝', route: '/admin/detalles-movimiento' },
+        { label: 'Dashboard', icon: 'speedometer2', route: '/admin/dashboard' },
+        { label: 'Categorías', icon: 'tags', route: '/admin/categorias' },
+        { label: 'Ubicaciones', icon: 'geo-alt', route: '/admin/ubicaciones' },
+        { label: 'Proveedores', icon: 'truck', route: '/admin/proveedores' },
+        { label: 'Productos', icon: 'box-seam', route: '/admin/productos' },
+        { label: 'Lotes', icon: 'boxes', route: '/admin/lotes' },
+        { label: 'Movimientos', icon: 'arrow-left-right', route: '/admin/movimientos' },
+        { label: 'Detalles Mov.', icon: 'receipt', route: '/admin/detalles-movimiento' },
     ];
 
     currentUser = this.authService.currentUser;

@@ -1,7 +1,9 @@
 <div class="app-shell" [class.collapsed]="sidebarCollapsed()">
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <span class="brand-icon">📦</span>
+            <span class="brand-icon">
+                <i class="bi bi-box-seam-fill" aria-hidden="true"></i>
+            </span>
             @if (!sidebarCollapsed()) {
                 <div>
                     <strong>WMS Intranet</strong>
@@ -16,7 +18,10 @@
                     routerLinkActive="active"
                     [title]="item.label"
                 >
-                    <span class="nav-icon">{{ item.icon }}</span>
+                    <i
+                        class="bi nav-icon bi-{{ item.icon }}"
+                        aria-hidden="true"
+                    ></i>
                     @if (!sidebarCollapsed()) {
                         <span>{{ item.label }}</span>
                     }
@@ -53,20 +58,7 @@
                     title="Cerrar sesión"
                     aria-label="Cerrar sesión"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
@@ -74,10 +66,13 @@
 
     <div class="main-area">
         <header class="navbar">
-            <button type="button" class="icon-btn" (click)="toggleSidebar()">☰</button>
+            <button type="button" class="icon-btn" (click)="toggleSidebar()">
+                <i class="bi bi-list" aria-hidden="true"></i>
+            </button>
             <div class="navbar-user">
                 <button type="button" class="user-btn" (click)="toggleUserMenu()">
-                    👤 {{ currentUser()?.username }}
+                    <i class="bi bi-person-circle" aria-hidden="true"></i>
+                    {{ currentUser()?.username }}
                 </button>
                 @if (userMenuOpen()) {
                     <div class="user-dropdown glass-card">
@@ -85,6 +80,7 @@
                         <small>{{ currentUser()?.role }}</small>
                         <a routerLink="/admin/perfil" (click)="userMenuOpen.set(false)">Perfil</a>
                         <button type="button" class="btn-danger btn-sm" (click)="logout()">
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                             Cerrar sesión
                         </button>
                     </div>

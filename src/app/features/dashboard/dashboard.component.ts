@@ -24,27 +24,27 @@ import { extractErrorMessage } from '../../core/utils/error.util';
         } @else if (data(); as d) {
             <div class="kpi-grid">
                 <div class="glass-card kpi-card">
-                    <span class="kpi-icon">📦</span>
+                    <i class="bi bi-box-seam kpi-icon" aria-hidden="true"></i>
                     <div class="kpi-value">{{ d.totalStock | number }}</div>
                     <div class="kpi-label">Stock total (unidades)</div>
                 </div>
                 <div class="glass-card kpi-card">
-                    <span class="kpi-icon">🏷️</span>
+                    <i class="bi bi-box kpi-icon" aria-hidden="true"></i>
                     <div class="kpi-value">{{ d.productCount }}</div>
                     <div class="kpi-label">Productos activos</div>
                 </div>
                 <div class="glass-card kpi-card">
-                    <span class="kpi-icon">📋</span>
+                    <i class="bi bi-boxes kpi-icon" aria-hidden="true"></i>
                     <div class="kpi-value">{{ d.batchCount }}</div>
                     <div class="kpi-label">Lotes activos</div>
                 </div>
                 <div class="glass-card kpi-card">
-                    <span class="kpi-icon">🔄</span>
+                    <i class="bi bi-arrow-left-right kpi-icon" aria-hidden="true"></i>
                     <div class="kpi-value">{{ d.movementCount }}</div>
                     <div class="kpi-label">Movimientos totales</div>
                 </div>
                 <div class="glass-card kpi-card">
-                    <span class="kpi-icon">📂</span>
+                    <i class="bi bi-tags kpi-icon" aria-hidden="true"></i>
                     <div class="kpi-value">{{ d.categoryCount }}</div>
                     <div class="kpi-label">Categorías</div>
                 </div>
@@ -52,7 +52,10 @@ import { extractErrorMessage } from '../../core/utils/error.util';
 
             <div class="dashboard-grid">
                 <section class="glass-card">
-                    <h2>⚠️ Alertas de stock bajo</h2>
+                    <h2>
+                        <i class="bi bi-exclamation-triangle section-icon" aria-hidden="true"></i>
+                        Alertas de stock bajo
+                    </h2>
                     @if (d.lowStockProducts.length === 0) {
                         <p class="muted">No hay productos con stock bajo.</p>
                     } @else {
@@ -69,7 +72,10 @@ import { extractErrorMessage } from '../../core/utils/error.util';
                 </section>
 
                 <section class="glass-card">
-                    <h2>⏳ Lotes por vencer (30 días)</h2>
+                    <h2>
+                        <i class="bi bi-hourglass-split section-icon" aria-hidden="true"></i>
+                        Lotes por vencer (30 días)
+                    </h2>
                     @if (d.expiringBatches.length === 0) {
                         <p class="muted">No hay lotes próximos a vencer.</p>
                     } @else {
@@ -87,7 +93,10 @@ import { extractErrorMessage } from '../../core/utils/error.util';
             </div>
 
             <section class="glass-card">
-                <h2>🕐 Movimientos recientes</h2>
+                <h2>
+                    <i class="bi bi-clock-history section-icon" aria-hidden="true"></i>
+                    Movimientos recientes
+                </h2>
                 @if (d.recentMovements.length === 0) {
                     <p class="muted">Sin movimientos registrados.</p>
                 } @else {
@@ -144,6 +153,8 @@ import { extractErrorMessage } from '../../core/utils/error.util';
         }
         .kpi-icon {
             font-size: 1.5rem;
+            line-height: 1;
+            color: var(--color-primary);
         }
         .kpi-value {
             font-size: var(--font-size-2xl);
@@ -163,6 +174,15 @@ import { extractErrorMessage } from '../../core/utils/error.util';
         h2 {
             margin: 0 0 1rem;
             font-size: var(--font-size-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-icon {
+            font-size: 1.125rem;
+            line-height: 1;
+            color: var(--color-primary);
+            flex-shrink: 0;
         }
         .alert-list {
             list-style: none;
