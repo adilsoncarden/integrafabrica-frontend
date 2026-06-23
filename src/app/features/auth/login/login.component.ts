@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, signal } from "@angular/core";
 import {
     FormBuilder,
     FormGroup,
@@ -19,6 +19,7 @@ import { CommonModule } from "@angular/common";
 export class LoginComponent {
     loginForm: FormGroup;
     errorMessage: string = "";
+    showPassword = signal<boolean>(false);
 
     constructor(
         private fb: FormBuilder,
@@ -29,6 +30,10 @@ export class LoginComponent {
             identifier: ["", [Validators.required]],
             password: ["", [Validators.required, Validators.minLength(4)]],
         });
+    }
+
+    togglePasswordVisibility(): void {
+        this.showPassword.update((v) => !v);
     }
 
     onSubmit() {

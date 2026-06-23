@@ -1,18 +1,5 @@
-/* Variables Actualizadas: Paleta Azul Marino y Fondo Moderno */
-$bg-gradient: linear-gradient(
-    135deg,
-    #1e293b 0%,
-    #334155 100%
-); /* Fondo Slate más claro */
-$card-bg: rgba(15, 23, 42, 0.8); /* Azul muy oscuro con transparencia */
-$input-bg: #1e293b;
-$primary-blue: #1e40af; /* Azul Marino Principal */
-$primary-hover: #1d4ed8; /* Azul más vibrante para hover */
-$text-muted: #94a3b8;
-$error-color: #ef4444;
-
 .login-wrapper {
-    background: $bg-gradient;
+    background: var(--color-bg-gradient);
     height: 100vh;
     width: 100vw;
     display: flex;
@@ -20,26 +7,21 @@ $error-color: #ef4444;
     align-items: center;
     padding: 0;
     margin: 0;
-    font-family:
-        "Inter",
-        system-ui,
-        -apple-system,
-        sans-serif;
-    position: fixed; /* Asegura que cubra toda la pantalla sin bordes */
+    font-family: var(--font-family);
+    position: fixed;
     top: 0;
     left: 0;
-    overflow: hidden; /* Evita cualquier scroll accidental */
+    overflow: hidden;
 }
 
 .login-card {
-    background: $card-bg;
-    backdrop-filter: blur(12px);
+    background: var(--color-surface);
     padding: 3rem 2.5rem;
-    border-radius: 1.5rem;
+    border-radius: var(--radius-xl);
     width: 100%;
     max-width: 440px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
     animation: fadeIn 0.6s ease-out;
 }
 
@@ -48,40 +30,36 @@ $error-color: #ef4444;
     margin-bottom: 2.5rem;
 
     .brand-icon {
-        background: linear-gradient(
-            135deg,
-            $primary-blue,
-            #3b82f6
-        ); /* Degradado Azul */
+        background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
         width: 64px;
         height: 64px;
         margin: 0 auto 1rem;
-        border-radius: 1rem;
+        border-radius: var(--radius-lg);
         display: flex;
         justify-content: center;
         align-items: center;
         font-size: 2rem;
-        box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.4);
+        box-shadow: var(--shadow-button);
     }
 
     .brand-name {
-        font-size: 1.875rem;
+        font-size: var(--font-size-xl);
         font-weight: 800;
-        color: white;
+        color: var(--color-text-primary);
         margin: 0;
         letter-spacing: -0.025em;
     }
 
     .brand-subtitle {
-        color: $text-muted;
-        font-size: 0.875rem;
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
         margin-top: 0.5rem;
     }
 }
 
 .form-title {
-    color: white;
-    font-size: 1.125rem;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-lg);
     font-weight: 600;
     margin-bottom: 1.5rem;
     text-align: center;
@@ -92,8 +70,8 @@ $error-color: #ef4444;
 
     label {
         display: block;
-        color: $text-muted;
-        font-size: 0.75rem;
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-xs);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -111,49 +89,87 @@ $error-color: #ef4444;
             left: 1rem;
             font-size: 1rem;
             opacity: 0.6;
+            pointer-events: none;
         }
 
         input {
             width: 100%;
             padding: 0.875rem 1rem 0.875rem 2.75rem;
-            background: $input-bg;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            border-radius: 0.75rem;
+            background: var(--color-input-bg);
+            border: 1px solid var(--color-border-input);
+            color: var(--color-text-primary);
+            border-radius: var(--radius-md);
             font-size: 0.95rem;
             transition: all 0.3s ease;
 
             &:focus {
                 outline: none;
-                border-color: $primary-blue;
-                background: #1e293b;
-                box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.2);
+                border-color: var(--color-primary);
+                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
             }
 
             &::placeholder {
-                color: #64748b;
+                color: var(--color-text-placeholder);
             }
+        }
+
+        &--password input {
+            padding-right: 2.75rem;
         }
     }
 }
 
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: color 0.2s ease, background 0.2s ease;
+
+    svg {
+        width: 1.125rem;
+        height: 1.125rem;
+    }
+
+    &:hover {
+        color: var(--color-primary);
+        background: rgba(79, 70, 229, 0.08);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
 .btn-login {
-    background-color: $primary-blue;
-    color: white;
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
     width: 100%;
     padding: 1rem;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: var(--radius-md);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     cursor: pointer;
     margin-top: 1.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover:not(:disabled) {
-        background-color: $primary-hover;
+        background-color: var(--color-primary-hover);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        box-shadow: var(--shadow-button);
     }
 
     &:active {
@@ -167,12 +183,12 @@ $error-color: #ef4444;
 }
 
 .error-container {
-    background: rgba($error-color, 0.1);
-    border: 1px solid rgba($error-color, 0.2);
-    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: var(--color-error-text);
     padding: 0.75rem;
-    border-radius: 0.75rem;
-    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     margin-top: 1rem;
     display: flex;
     align-items: center;
@@ -182,13 +198,14 @@ $error-color: #ef4444;
 .form-footer {
     margin-top: 2rem;
     text-align: center;
-    font-size: 0.875rem;
-    color: $text-muted;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
 
     a {
-        color: #60a5fa; /* Azul claro para links sobre fondo oscuro */
+        color: var(--color-primary);
         text-decoration: none;
         font-weight: 600;
+
         &:hover {
             text-decoration: underline;
         }

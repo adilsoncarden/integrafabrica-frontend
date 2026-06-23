@@ -21,7 +21,7 @@ import { Component } from '@angular/core';
         .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(79, 70, 229, 0.15);
             border-top-color: var(--color-accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
