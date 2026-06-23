@@ -75,14 +75,29 @@
                     {{ currentUser()?.username }}
                 </button>
                 @if (userMenuOpen()) {
-                    <div class="user-dropdown glass-card">
-                        <p><strong>{{ currentUser()?.username }}</strong></p>
-                        <small>{{ currentUser()?.role }}</small>
-                        <a routerLink="/admin/perfil" (click)="userMenuOpen.set(false)">Perfil</a>
-                        <button type="button" class="btn-danger btn-sm" (click)="logout()">
-                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-                            Cerrar sesión
-                        </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <strong>{{ currentUser()?.username }}</strong>
+                            <small>{{ userRoleLabel() }}</small>
+                        </div>
+                        <nav class="user-dropdown-menu">
+                            <a
+                                routerLink="/admin/perfil"
+                                class="user-dropdown-item"
+                                (click)="userMenuOpen.set(false)"
+                            >
+                                <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                                Perfil
+                            </a>
+                            <button
+                                type="button"
+                                class="user-dropdown-item user-dropdown-item--logout"
+                                (click)="logout()"
+                            >
+                                <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                                Cerrar sesión
+                            </button>
+                        </nav>
                     </div>
                 }
             </div>

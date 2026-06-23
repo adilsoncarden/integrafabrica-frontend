@@ -38,8 +38,13 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 2rem;
         box-shadow: var(--shadow-button);
+        color: var(--color-text-on-primary);
+
+        .bi {
+            font-size: 1.75rem;
+            line-height: 1;
+        }
     }
 
     .brand-name {
@@ -88,7 +93,9 @@
             position: absolute;
             left: 1rem;
             font-size: 1rem;
-            opacity: 0.6;
+            line-height: 1;
+            color: var(--color-text-secondary);
+            opacity: 0.75;
             pointer-events: none;
         }
 
@@ -137,9 +144,9 @@
     border-radius: var(--radius-sm);
     transition: color 0.2s ease, background 0.2s ease;
 
-    svg {
-        width: 1.125rem;
-        height: 1.125rem;
+    .bi {
+        font-size: 1.125rem;
+        line-height: 1;
     }
 
     &:hover {
@@ -193,6 +200,12 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    .error-icon {
+        font-size: 1rem;
+        line-height: 1;
+        flex-shrink: 0;
+    }
 }
 
 .form-footer {
