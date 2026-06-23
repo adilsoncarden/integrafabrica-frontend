@@ -1,0 +1,72 @@
+<div class="app-shell" [class.collapsed]="sidebarCollapsed()">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">📦</span>
+            @if (!sidebarCollapsed()) {
+                <div>
+                    <strong>WMS Intranet</strong>
+                    <small>IntegraFábrica</small>
+                </div>
+            }
+        </div>
+        <nav class="sidebar-nav">
+            @for (item of navItems; track item.route) {
+                <a
+                    [routerLink]="item.route"
+                    routerLinkActive="active"
+                    [title]="item.label"
+                >
+                    <span class="nav-icon">{{ item.icon }}</span>
+                    @if (!sidebarCollapsed()) {
+                        <span>{{ item.label }}</span>
+                    }
+                </a>
+            }
+        </nav>
+        <div class="sidebar-footer">
+            <a routerLink="/admin/perfil" routerLinkActive="active" title="Perfil">
+                <span class="nav-icon">👤</span>
+                @if (!sidebarCollapsed()) {
+                    <span>Perfil</span>
+                }
+            </a>
+            <button type="button" class="logout-btn" (click)="logout()" title="Cerrar sesión">
+                <span class="nav-icon">🚪</span>
+                @if (!sidebarCollapsed()) {
+                    <span>Cerrar sesión</span>
+                }
+            </button>
+        </div>
+    </aside>
+
+    <div class="main-area">
+        <header class="navbar">
+            <button type="button" class="icon-btn" (click)="toggleSidebar()">☰</button>
+            <div class="navbar-user">
+                <button type="button" class="user-btn" (click)="toggleUserMenu()">
+                    👤 {{ currentUser()?.username }}
+                </button>
+                @if (userMenuOpen()) {
+                    <div class="user-dropdown glass-card">
+                        <p><strong>{{ currentUser()?.username }}</strong></p>
+                        <small>{{ currentUser()?.role }}</small>
+                        <a routerLink="/admin/perfil" (click)="userMenuOpen.set(false)">Perfil</a>
+                        <button type="button" class="btn-danger btn-sm" (click)="logout()">
+                            Cerrar sesión
+                        </button>
+                    </div>
+                }
+            </div>
+        </header>
+
+        <main class="content fade-in">
+            <router-outlet />
+        </main>
+
+        <footer class="footer">
+            © 2026 IntegraFábrica · WMS Intranet · v0.0.0
+        </footer>
+    </div>
+</div>
+
+<app-confirm-dialog />

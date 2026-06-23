@@ -33,11 +33,18 @@ export class LoginComponent {
 
     onSubmit() {
         if (this.loginForm.valid) {
+            this.errorMessage = '';
             this.authService.login(this.loginForm.value).subscribe({
-                next: () => this.router.navigate(["/admin/dashboard"]),
-                error: () =>
-                    (this.errorMessage =
-                        "Credenciales incorrectas. Intente de nuevo."),
+                next: () => this.router.navigate(['/admin/dashboard']),
+                error: (err) => {
+                    if (err.status === 401) {
+                        this.errorMessage =
+                            'Credenciales incorrectas. Intente de nuevo.';
+                    } else {
+                        this.errorMessage =
+                            'No se pudo iniciar sesión. Verifique el servidor.';
+                    }
+                },
             });
         }
     }
