@@ -1,8 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { API_URL } from '../config/api.config';
 import { Location, LocationRequest } from '../models/location.model';
+import { PageResponse } from '../models/page.model';
+
+const UNPAGED_SIZE = 10_000;
 
 @Injectable({ providedIn: 'root' })
 export class LocationService {
@@ -11,8 +14,15 @@ export class LocationService {
 
     locations = signal<Location[]>([]);
 
+    getPage(page = 0, size = 10): Observable<PageResponse<Location>> {
+        return this.http.get<PageResponse<Location>>(this.base, {
+            params: { page, size },
+        });
+    }
+
     getAll(): Observable<Location[]> {
-        return this.http.get<Location[]>(this.base).pipe(
+        return this.getPage(0, UNPAGED_SIZE).pipe(
+            map((response) => response.content),
             tap((items) => this.locations.set(items)),
         );
     }

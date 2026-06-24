@@ -1,8 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { API_URL } from '../config/api.config';
 import { Supplier, SupplierRequest } from '../models/supplier.model';
+import { PageResponse } from '../models/page.model';
+
+const UNPAGED_SIZE = 10_000;
 
 @Injectable({ providedIn: 'root' })
 export class SupplierService {
@@ -11,8 +14,15 @@ export class SupplierService {
 
     suppliers = signal<Supplier[]>([]);
 
+    getPage(page = 0, size = 10): Observable<PageResponse<Supplier>> {
+        return this.http.get<PageResponse<Supplier>>(this.base, {
+            params: { page, size },
+        });
+    }
+
     getAll(): Observable<Supplier[]> {
-        return this.http.get<Supplier[]>(this.base).pipe(
+        return this.getPage(0, UNPAGED_SIZE).pipe(
+            map((response) => response.content),
             tap((items) => this.suppliers.set(items)),
         );
     }

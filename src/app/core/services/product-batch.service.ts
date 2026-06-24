@@ -1,8 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { API_URL } from '../config/api.config';
 import { ProductBatch, ProductBatchRequest } from '../models/product-batch.model';
+import { PageResponse } from '../models/page.model';
+
+const UNPAGED_SIZE = 10_000;
 
 @Injectable({ providedIn: 'root' })
 export class ProductBatchService {
@@ -11,8 +14,15 @@ export class ProductBatchService {
 
     batches = signal<ProductBatch[]>([]);
 
+    getPage(page = 0, size = 10): Observable<PageResponse<ProductBatch>> {
+        return this.http.get<PageResponse<ProductBatch>>(this.base, {
+            params: { page, size },
+        });
+    }
+
     getAll(): Observable<ProductBatch[]> {
-        return this.http.get<ProductBatch[]>(this.base).pipe(
+        return this.getPage(0, UNPAGED_SIZE).pipe(
+            map((response) => response.content),
             tap((items) => this.batches.set(items)),
         );
     }

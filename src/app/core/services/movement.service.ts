@@ -1,8 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { API_URL } from '../config/api.config';
 import { Movement, MovementRequest } from '../models/movement.model';
+import { PageResponse } from '../models/page.model';
+
+const UNPAGED_SIZE = 10_000;
 
 @Injectable({ providedIn: 'root' })
 export class MovementService {
@@ -11,16 +14,30 @@ export class MovementService {
 
     movements = signal<Movement[]>([]);
 
+    getPage(page = 0, size = 10): Observable<PageResponse<Movement>> {
+        return this.http.get<PageResponse<Movement>>(this.base, {
+            params: { page, size },
+        });
+    }
+
+    getByTypePage(type: string, page = 0, size = 10): Observable<PageResponse<Movement>> {
+        return this.http.get<PageResponse<Movement>>(`${this.base}/filtrar`, {
+            params: { type, page, size },
+        });
+    }
+
     getAll(): Observable<Movement[]> {
-        return this.http.get<Movement[]>(this.base).pipe(
+        return this.getPage(0, UNPAGED_SIZE).pipe(
+            map((response) => response.content),
             tap((items) => this.movements.set(items)),
         );
     }
 
     getByType(type: string): Observable<Movement[]> {
-        return this.http.get<Movement[]>(`${this.base}/filtrar`, {
-            params: { type },
-        });
+        return this.getByTypePage(type, 0, UNPAGED_SIZE).pipe(
+            map((response) => response.content),
+            tap((items) => this.movements.set(items)),
+        );
     }
 
     getById(id: number): Observable<Movement> {

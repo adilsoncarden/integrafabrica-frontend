@@ -7,6 +7,7 @@ import { Location } from '../../../core/models/location.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
+import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
 import { extractErrorMessage } from '../../../core/utils/error.util';
 
 @Component({
@@ -18,6 +19,7 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         PageHeaderComponent,
         LoadingSpinnerComponent,
         EmptyStateComponent,
+        PaginationNavComponent,
     ],
     template: `
         <app-page-header title="Ubicaciones" subtitle="Pasillos, estantes y niveles del almacén">
@@ -30,7 +32,7 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (items().length === 0) {
+        } @else if (totalElements() === 0) {
             <app-empty-state icon="📍" title="Sin ubicaciones" message="Registra ubicaciones para asignar productos.">
                 <a routerLink="/admin/ubicaciones/nuevo" class="btn">+ Nuevo</a>
             </app-empty-state>
@@ -66,6 +68,12 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                         }
                     </tbody>
                 </table>
+                <app-pagination-nav
+                    [currentPage]="currentPage()"
+                    [pageSize]="pageSize()"
+                    [totalElements]="totalElements()"
+                    (pageChange)="changePage($event)"
+                />
             </div>
         }
     `,
@@ -77,7 +85,10 @@ export class LocationListComponent implements OnInit {
 
     loading = signal(true);
     error = signal('');
-    items = this.service.locations;
+    items = signal<Location[]>([]);
+    currentPage = signal(0);
+    pageSize = signal(10);
+    totalElements = signal(0);
 
     ngOnInit(): void {
         this.load();
@@ -86,13 +97,22 @@ export class LocationListComponent implements OnInit {
     load(): void {
         this.loading.set(true);
         this.error.set('');
-        this.service.getAll().subscribe({
-            next: () => this.loading.set(false),
+        this.service.getPage(this.currentPage(), this.pageSize()).subscribe({
+            next: (page) => {
+                this.items.set(page.content);
+                this.totalElements.set(page.totalElements);
+                this.loading.set(false);
+            },
             error: (err) => {
                 this.error.set(extractErrorMessage(err, 'Error al cargar ubicaciones.'));
                 this.loading.set(false);
             },
         });
+    }
+
+    changePage(page: number): void {
+        this.currentPage.set(page);
+        this.load();
     }
 
     async onDelete(item: Location): Promise<void> {

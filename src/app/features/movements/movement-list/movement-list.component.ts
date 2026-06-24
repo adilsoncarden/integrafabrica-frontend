@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MovementService } from '../../../core/services/movement.service';
@@ -7,6 +7,7 @@ import { Movement, MovementType } from '../../../core/models/movement.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
+import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
 import { extractErrorMessage } from '../../../core/utils/error.util';
 
 type FilterTab = 'ALL' | MovementType;
@@ -20,6 +21,7 @@ type FilterTab = 'ALL' | MovementType;
         PageHeaderComponent,
         LoadingSpinnerComponent,
         EmptyStateComponent,
+        PaginationNavComponent,
     ],
     template: `
         <app-page-header title="Movimientos" subtitle="Entradas, salidas y mermas">
@@ -45,7 +47,7 @@ type FilterTab = 'ALL' | MovementType;
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (filteredItems().length === 0) {
+        } @else if (totalElements() === 0) {
             <app-empty-state icon="🔄" title="Sin movimientos" message="No hay movimientos para este filtro.">
                 <a routerLink="/admin/movimientos/nuevo" class="btn">+ Nuevo</a>
             </app-empty-state>
@@ -64,7 +66,7 @@ type FilterTab = 'ALL' | MovementType;
                         </tr>
                     </thead>
                     <tbody>
-                        @for (item of filteredItems(); track item.id) {
+                        @for (item of items(); track item.id) {
                             <tr>
                                 <td>{{ item.id }}</td>
                                 <td>
@@ -85,6 +87,12 @@ type FilterTab = 'ALL' | MovementType;
                         }
                     </tbody>
                 </table>
+                <app-pagination-nav
+                    [currentPage]="currentPage()"
+                    [pageSize]="pageSize()"
+                    [totalElements]="totalElements()"
+                    (pageChange)="changePage($event)"
+                />
             </div>
         }
     `,
@@ -120,7 +128,10 @@ export class MovementListComponent implements OnInit {
     loading = signal(true);
     error = signal('');
     activeTab = signal<FilterTab>('ALL');
-    allItems = this.service.movements;
+    items = signal<Movement[]>([]);
+    currentPage = signal(0);
+    pageSize = signal(10);
+    totalElements = signal(0);
 
     tabs: { value: FilterTab; label: string }[] = [
         { value: 'ALL', label: 'Todos' },
@@ -129,31 +140,32 @@ export class MovementListComponent implements OnInit {
         { value: 'MERMA', label: 'Merma' },
     ];
 
-    filteredItems = computed(() => {
-        const tab = this.activeTab();
-        const items = this.allItems();
-        if (tab === 'ALL') return items;
-        return items.filter((m) => m.movement_type === tab);
-    });
-
     ngOnInit(): void {
         this.load();
     }
 
     setTab(tab: FilterTab): void {
         this.activeTab.set(tab);
-        if (tab === 'ALL') {
-            this.load();
-        } else {
-            this.loadByType(tab);
-        }
+        this.currentPage.set(0);
+        this.load();
     }
 
     load(): void {
         this.loading.set(true);
         this.error.set('');
-        this.service.getAll().subscribe({
-            next: () => this.loading.set(false),
+
+        const tab = this.activeTab();
+        const request =
+            tab === 'ALL'
+                ? this.service.getPage(this.currentPage(), this.pageSize())
+                : this.service.getByTypePage(tab, this.currentPage(), this.pageSize());
+
+        request.subscribe({
+            next: (page) => {
+                this.items.set(page.content);
+                this.totalElements.set(page.totalElements);
+                this.loading.set(false);
+            },
             error: (err) => {
                 this.error.set(extractErrorMessage(err, 'Error al cargar movimientos.'));
                 this.loading.set(false);
@@ -161,16 +173,9 @@ export class MovementListComponent implements OnInit {
         });
     }
 
-    loadByType(type: MovementType): void {
-        this.loading.set(true);
-        this.error.set('');
-        this.service.getByType(type).subscribe({
-            next: () => this.loading.set(false),
-            error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al filtrar movimientos.'));
-                this.loading.set(false);
-            },
-        });
+    changePage(page: number): void {
+        this.currentPage.set(page);
+        this.load();
     }
 
     typeBadge(type: string): string {
@@ -196,10 +201,7 @@ export class MovementListComponent implements OnInit {
         if (!confirmed) return;
 
         this.service.delete(item.id).subscribe({
-            next: () => {
-                const tab = this.activeTab();
-                tab === 'ALL' ? this.load() : this.loadByType(tab as MovementType);
-            },
+            next: () => this.load(),
             error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
