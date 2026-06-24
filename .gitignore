@@ -1,0 +1,8 @@
+# Angular build outputs
+dist/
+/dist
+.angular/
+
+# Local development files
+*.log
+.tsbuildinfo
