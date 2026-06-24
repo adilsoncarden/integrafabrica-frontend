@@ -4,6 +4,7 @@ import { forkJoin } from 'rxjs';
 import { MovementService } from '../../../core/services/movement.service';
 import { MovementDetailService } from '../../../core/services/movement-detail.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { MovementDetail } from '../../../core/models/movement-detail.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -23,10 +24,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         <app-page-header title="Detalles de movimiento" subtitle="Líneas de productos en movimientos">
             <a routerLink="/admin/detalles-movimiento/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
-
-        @if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
-        }
 
         @if (loading()) {
             <app-loading-spinner />
@@ -75,9 +72,9 @@ export class DetailListComponent implements OnInit {
     private readonly movementService = inject(MovementService);
     private readonly detailService = inject(MovementDetailService);
     private readonly confirmDialog = inject(ConfirmDialogService);
+    private readonly toast = inject(ToastService);
 
     loading = signal(true);
-    error = signal('');
     items = signal<MovementDetail[]>([]);
 
     ngOnInit(): void {
@@ -86,7 +83,6 @@ export class DetailListComponent implements OnInit {
 
     load(): void {
         this.loading.set(true);
-        this.error.set('');
         this.movementService.getAll().subscribe({
             next: (movements) => {
                 if (movements.length === 0) {
@@ -102,13 +98,13 @@ export class DetailListComponent implements OnInit {
                         this.loading.set(false);
                     },
                     error: (err) => {
-                        this.error.set(extractErrorMessage(err, 'Error al cargar detalles.'));
+                        this.toast.error(extractErrorMessage(err, 'Error al cargar detalles.'));
                         this.loading.set(false);
                     },
                 });
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar movimientos.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar movimientos.'));
                 this.loading.set(false);
             },
         });
@@ -124,8 +120,11 @@ export class DetailListComponent implements OnInit {
         if (!confirmed) return;
 
         this.detailService.delete(item.id).subscribe({
-            next: () => this.load(),
-            error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
+            next: () => {
+                this.toast.success(`Línea #${item.id} eliminada.`);
+                this.load();
+            },
+            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
 }

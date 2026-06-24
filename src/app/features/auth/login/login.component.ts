@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import {
     FormBuilder,
     FormGroup,
@@ -7,6 +7,7 @@ import {
 } from "@angular/forms";
 import { Router } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
+import { ToastService } from "../../../core/services/toast.service";
 import { CommonModule } from "@angular/common";
 
 @Component({
@@ -17,15 +18,15 @@ import { CommonModule } from "@angular/common";
     styleUrls: ['../../../styles/_login.scss']
 })
 export class LoginComponent {
+    private readonly fb = inject(FormBuilder);
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+    private readonly toast = inject(ToastService);
+
     loginForm: FormGroup;
-    errorMessage: string = "";
     showPassword = signal<boolean>(false);
 
-    constructor(
-        private fb: FormBuilder,
-        private authService: AuthService,
-        private router: Router,
-    ) {
+    constructor() {
         this.loginForm = this.fb.group({
             identifier: ["", [Validators.required]],
             password: ["", [Validators.required, Validators.minLength(4)]],
@@ -38,16 +39,13 @@ export class LoginComponent {
 
     onSubmit() {
         if (this.loginForm.valid) {
-            this.errorMessage = '';
             this.authService.login(this.loginForm.value).subscribe({
                 next: () => this.router.navigate(['/admin/dashboard']),
                 error: (err) => {
                     if (err.status === 401) {
-                        this.errorMessage =
-                            'Credenciales incorrectas. Intente de nuevo.';
+                        this.toast.error('Credenciales incorrectas. Intente de nuevo.');
                     } else {
-                        this.errorMessage =
-                            'No se pudo iniciar sesión. Verifique el servidor.';
+                        this.toast.error('No se pudo iniciar sesión. Verifique el servidor.');
                     }
                 },
             });

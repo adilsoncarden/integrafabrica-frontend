@@ -5,6 +5,7 @@ import { forkJoin } from 'rxjs';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { LocationService } from '../../../core/services/location.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Category } from '../../../core/models/category.model';
 import { Location } from '../../../core/models/location.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -24,10 +25,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         @if (loading()) {
             <app-loading-spinner />
         } @else {
-            @if (error()) {
-                <div class="alert alert-error">{{ error() }}</div>
-            }
-
             <form class="glass-card" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="form-grid">
                     <div class="form-group">
@@ -87,12 +84,12 @@ export class ProductFormComponent implements OnInit {
     private readonly locationService = inject(LocationService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly toast = inject(ToastService);
 
     isEdit = false;
     editId: number | null = null;
     loading = signal(true);
     saving = signal(false);
-    error = signal('');
     categories = signal<Category[]>([]);
     locations = signal<Location[]>([]);
 
@@ -140,7 +137,7 @@ export class ProductFormComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar datos.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar datos.'));
                 this.loading.set(false);
             },
         });
@@ -152,7 +149,6 @@ export class ProductFormComponent implements OnInit {
         if (v.categoryId == null || v.locationId == null) return;
 
         this.saving.set(true);
-        this.error.set('');
         const request = {
             sku: v.sku!,
             name: v.name!,
@@ -168,9 +164,12 @@ export class ProductFormComponent implements OnInit {
                 : this.productService.create(request);
 
         op.subscribe({
-            next: () => this.router.navigate(['/admin/productos']),
+            next: () => {
+                this.toast.success(this.isEdit ? 'Producto actualizado.' : 'Producto creado.');
+                this.router.navigate(['/admin/productos']);
+            },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
                 this.saving.set(false);
             },
         });

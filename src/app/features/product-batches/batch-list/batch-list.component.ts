@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { ProductBatchService } from '../../../core/services/product-batch.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { ProductBatch } from '../../../core/models/product-batch.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -25,10 +26,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         <app-page-header title="Lotes" subtitle="Gestión de lotes de productos">
             <a routerLink="/admin/lotes/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
-
-        @if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
-        }
 
         @if (loading()) {
             <app-loading-spinner />
@@ -82,9 +79,9 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class BatchListComponent implements OnInit {
     private readonly service = inject(ProductBatchService);
     private readonly confirmDialog = inject(ConfirmDialogService);
+    private readonly toast = inject(ToastService);
 
     loading = signal(true);
-    error = signal('');
     items = signal<ProductBatch[]>([]);
     currentPage = signal(0);
     pageSize = signal(10);
@@ -96,7 +93,6 @@ export class BatchListComponent implements OnInit {
 
     load(): void {
         this.loading.set(true);
-        this.error.set('');
         this.service.getPage(this.currentPage(), this.pageSize()).subscribe({
             next: (page) => {
                 this.items.set(page.content);
@@ -104,7 +100,7 @@ export class BatchListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar lotes.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar lotes.'));
                 this.loading.set(false);
             },
         });
@@ -125,8 +121,11 @@ export class BatchListComponent implements OnInit {
         if (!confirmed) return;
 
         this.service.delete(item.id).subscribe({
-            next: () => this.load(),
-            error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
+            next: () => {
+                this.toast.success(`Lote "${item.batch_code}" eliminado.`);
+                this.load();
+            },
+            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
 }

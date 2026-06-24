@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MovementService } from '../../../core/services/movement.service';
 import { SupplierService } from '../../../core/services/supplier.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Supplier } from '../../../core/models/supplier.model';
 import { MovementType } from '../../../core/models/movement.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -23,10 +24,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         @if (loading()) {
             <app-loading-spinner />
         } @else {
-            @if (error()) {
-                <div class="alert alert-error">{{ error() }}</div>
-            }
-
             <form class="glass-card" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="form-grid">
                     <div class="form-group">
@@ -78,12 +75,12 @@ export class MovementFormComponent implements OnInit {
     private readonly supplierService = inject(SupplierService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly toast = inject(ToastService);
 
     isEdit = false;
     editId: number | null = null;
     loading = signal(true);
     saving = signal(false);
-    error = signal('');
     suppliers = signal<Supplier[]>([]);
     showSupplier = signal(true);
 
@@ -131,7 +128,7 @@ export class MovementFormComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar datos.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar datos.'));
                 this.loading.set(false);
             },
         });
@@ -141,7 +138,6 @@ export class MovementFormComponent implements OnInit {
         if (this.form.invalid) return;
         const v = this.form.getRawValue();
         this.saving.set(true);
-        this.error.set('');
 
         const request = {
             movement_type: v.movement_type!,
@@ -157,9 +153,12 @@ export class MovementFormComponent implements OnInit {
                 : this.movementService.create(request);
 
         op.subscribe({
-            next: () => this.router.navigate(['/admin/movimientos']),
+            next: () => {
+                this.toast.success(this.isEdit ? 'Movimiento actualizado.' : 'Movimiento creado.');
+                this.router.navigate(['/admin/movimientos']);
+            },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
                 this.saving.set(false);
             },
         });

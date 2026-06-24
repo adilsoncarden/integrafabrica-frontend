@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { SupplierService } from '../../../core/services/supplier.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Supplier } from '../../../core/models/supplier.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -19,8 +20,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
         } @else if (item(); as s) {
             <div class="glass-card">
                 <div class="detail-row"><span class="label">ID</span><span>{{ s.id }}</span></div>
@@ -47,10 +46,10 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class SupplierDetailComponent implements OnInit {
     private readonly service = inject(SupplierService);
     private readonly route = inject(ActivatedRoute);
+    private readonly toast = inject(ToastService);
 
     id = Number(this.route.snapshot.paramMap.get('id'));
     loading = signal(true);
-    error = signal('');
     item = signal<Supplier | null>(null);
 
     ngOnInit(): void {
@@ -60,7 +59,7 @@ export class SupplierDetailComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'No se pudo cargar el proveedor.'));
+                this.toast.error(extractErrorMessage(err, 'No se pudo cargar el proveedor.'));
                 this.loading.set(false);
             },
         });

@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SupplierService } from '../../../core/services/supplier.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { extractErrorMessage } from '../../../core/utils/error.util';
@@ -19,10 +20,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         @if (loading()) {
             <app-loading-spinner />
         } @else {
-            @if (error()) {
-                <div class="alert alert-error">{{ error() }}</div>
-            }
-
             <form class="glass-card" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="form-grid">
                     <div class="form-group">
@@ -66,12 +63,12 @@ export class SupplierFormComponent implements OnInit {
     private readonly service = inject(SupplierService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly toast = inject(ToastService);
 
     isEdit = false;
     editId: number | null = null;
     loading = signal(false);
     saving = signal(false);
-    error = signal('');
 
     form = this.fb.nonNullable.group({
         ruc: ['', [Validators.required, Validators.pattern(/^[0-9]{11}$/)]],
@@ -101,7 +98,7 @@ export class SupplierFormComponent implements OnInit {
                     this.loading.set(false);
                 },
                 error: (err) => {
-                    this.error.set(extractErrorMessage(err, 'No se pudo cargar el proveedor.'));
+                    this.toast.error(extractErrorMessage(err, 'No se pudo cargar el proveedor.'));
                     this.loading.set(false);
                 },
             });
@@ -111,7 +108,6 @@ export class SupplierFormComponent implements OnInit {
     onSubmit(): void {
         if (this.form.invalid) return;
         this.saving.set(true);
-        this.error.set('');
         const v = this.form.getRawValue();
         const request = {
             ruc: v.ruc,
@@ -127,9 +123,12 @@ export class SupplierFormComponent implements OnInit {
                 : this.service.create(request);
 
         op.subscribe({
-            next: () => this.router.navigate(['/admin/proveedores']),
+            next: () => {
+                this.toast.success(this.isEdit ? 'Proveedor actualizado.' : 'Proveedor creado.');
+                this.router.navigate(['/admin/proveedores']);
+            },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
                 this.saving.set(false);
             },
         });

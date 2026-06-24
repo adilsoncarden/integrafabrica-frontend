@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { LocationService } from '../../../core/services/location.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Location } from '../../../core/models/location.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -25,10 +26,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         <app-page-header title="Ubicaciones" subtitle="Pasillos, estantes y niveles del almacén">
             <a routerLink="/admin/ubicaciones/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
-
-        @if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
-        }
 
         @if (loading()) {
             <app-loading-spinner />
@@ -82,9 +79,9 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class LocationListComponent implements OnInit {
     private readonly service = inject(LocationService);
     private readonly confirmDialog = inject(ConfirmDialogService);
+    private readonly toast = inject(ToastService);
 
     loading = signal(true);
-    error = signal('');
     items = signal<Location[]>([]);
     currentPage = signal(0);
     pageSize = signal(10);
@@ -96,7 +93,6 @@ export class LocationListComponent implements OnInit {
 
     load(): void {
         this.loading.set(true);
-        this.error.set('');
         this.service.getPage(this.currentPage(), this.pageSize()).subscribe({
             next: (page) => {
                 this.items.set(page.content);
@@ -104,7 +100,7 @@ export class LocationListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar ubicaciones.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar ubicaciones.'));
                 this.loading.set(false);
             },
         });
@@ -125,8 +121,11 @@ export class LocationListComponent implements OnInit {
         if (!confirmed) return;
 
         this.service.delete(item.id).subscribe({
-            next: () => this.load(),
-            error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
+            next: () => {
+                this.toast.success(`Ubicación ${item.aisle}-${item.rack}-${item.level} eliminada.`);
+                this.load();
+            },
+            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
 }

@@ -1,7 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 
 interface NavItem {
     label: string;
@@ -12,7 +11,7 @@ interface NavItem {
 @Component({
     selector: 'app-main-layout',
     standalone: true,
-    imports: [RouterOutlet, RouterLink, RouterLinkActive, ConfirmDialogComponent],
+    imports: [RouterOutlet, RouterLink, RouterLinkActive],
     templateUrl: './main-layout.component.html',
     styleUrl: './main-layout.component.scss',
 })

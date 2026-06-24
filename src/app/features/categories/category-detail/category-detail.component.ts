@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { CategoryService } from '../../../core/services/category.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Category } from '../../../core/models/category.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -19,8 +20,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
         } @else if (item(); as cat) {
             <div class="glass-card detail-grid">
                 <div class="detail-row"><span class="label">ID</span><span>{{ cat.id }}</span></div>
@@ -46,10 +45,10 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class CategoryDetailComponent implements OnInit {
     private readonly service = inject(CategoryService);
     private readonly route = inject(ActivatedRoute);
+    private readonly toast = inject(ToastService);
 
     id = Number(this.route.snapshot.paramMap.get('id'));
     loading = signal(true);
-    error = signal('');
     item = signal<Category | null>(null);
 
     ngOnInit(): void {
@@ -59,7 +58,7 @@ export class CategoryDetailComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'No se pudo cargar la categoría.'));
+                this.toast.error(extractErrorMessage(err, 'No se pudo cargar la categoría.'));
                 this.loading.set(false);
             },
         });

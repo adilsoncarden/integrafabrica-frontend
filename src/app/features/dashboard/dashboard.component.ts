@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { DashboardService, DashboardData } from '../../core/services/dashboard.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { extractErrorMessage } from '../../core/utils/error.util';
@@ -19,8 +20,6 @@ import { extractErrorMessage } from '../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
         } @else if (data(); as d) {
             <div class="kpi-grid">
                 <div class="glass-card kpi-card">
@@ -205,10 +204,10 @@ import { extractErrorMessage } from '../../core/utils/error.util';
 })
 export class DashboardComponent implements OnInit {
     private readonly dashboardService = inject(DashboardService);
+    private readonly toast = inject(ToastService);
     readonly authService = inject(AuthService);
 
     loading = signal(true);
-    error = signal('');
     data = signal<DashboardData | null>(null);
 
     ngOnInit(): void {
@@ -218,7 +217,7 @@ export class DashboardComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'No se pudo cargar el dashboard.'));
+                this.toast.error(extractErrorMessage(err, 'No se pudo cargar el dashboard.'));
                 this.loading.set(false);
             },
         });

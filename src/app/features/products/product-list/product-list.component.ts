@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Product } from '../../../core/models/product.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -23,10 +24,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         <app-page-header title="Productos" subtitle="Inventario de productos">
             <a routerLink="/admin/productos/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
-
-        @if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
-        }
 
         @if (loading()) {
             <app-loading-spinner />
@@ -87,9 +84,9 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class ProductListComponent implements OnInit {
     private readonly service = inject(ProductService);
     private readonly confirmDialog = inject(ConfirmDialogService);
+    private readonly toast = inject(ToastService);
 
     loading = signal(true);
-    error = signal('');
     items = signal<Product[]>([]);
     currentPage = signal(0);
     pageSize = signal(10);
@@ -101,7 +98,6 @@ export class ProductListComponent implements OnInit {
 
     load(): void {
         this.loading.set(true);
-        this.error.set('');
         this.service.getPage(this.currentPage(), this.pageSize()).subscribe({
             next: (page) => {
                 this.items.set(page.content);
@@ -109,7 +105,7 @@ export class ProductListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar productos.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar productos.'));
                 this.loading.set(false);
             },
         });
@@ -130,8 +126,11 @@ export class ProductListComponent implements OnInit {
         if (!confirmed) return;
 
         this.service.delete(item.id).subscribe({
-            next: () => this.load(),
-            error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
+            next: () => {
+                this.toast.success(`Producto "${item.name}" eliminado.`);
+                this.load();
+            },
+            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
 }

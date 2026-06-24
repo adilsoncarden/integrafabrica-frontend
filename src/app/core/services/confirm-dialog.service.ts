@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
+import Swal from 'sweetalert2';
 
 export interface ConfirmOptions {
     title: string;
@@ -10,33 +11,25 @@ export interface ConfirmOptions {
 
 @Injectable({ providedIn: 'root' })
 export class ConfirmDialogService {
-    visible = signal(false);
-    options = signal<ConfirmOptions | null>(null);
-
-    private resolveFn: ((value: boolean) => void) | null = null;
-
     confirm(options: ConfirmOptions): Promise<boolean> {
-        this.options.set({
-            confirmLabel: 'Confirmar',
-            cancelLabel: 'Cancelar',
-            danger: false,
-            ...options,
-        });
-        this.visible.set(true);
-        return new Promise<boolean>((resolve) => {
-            this.resolveFn = resolve;
-        });
-    }
-
-    accept(): void {
-        this.visible.set(false);
-        this.resolveFn?.(true);
-        this.resolveFn = null;
-    }
-
-    cancel(): void {
-        this.visible.set(false);
-        this.resolveFn?.(false);
-        this.resolveFn = null;
+        return Swal.fire({
+            title: options.title,
+            text: options.message,
+            icon: options.danger ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonText: options.confirmLabel ?? 'Confirmar',
+            cancelButtonText: options.cancelLabel ?? 'Cancelar',
+            confirmButtonColor: options.danger ? '#dc2626' : '#4f46e5',
+            cancelButtonColor: '#64748b',
+            reverseButtons: true,
+            focusCancel: !!options.danger,
+            customClass: {
+                popup: 'wms-swal-popup',
+                title: 'wms-swal-title',
+                htmlContainer: 'wms-swal-text',
+                confirmButton: 'wms-swal-confirm',
+                cancelButton: 'wms-swal-cancel',
+            },
+        }).then((result) => result.isConfirmed);
     }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MovementDetailService } from '../../../core/services/movement-detail.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { MovementDetail } from '../../../core/models/movement-detail.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -18,8 +19,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
         } @else if (item(); as d) {
             <div class="glass-card">
                 <div class="detail-row"><span class="label">ID</span><span>{{ d.id }}</span></div>
@@ -59,10 +58,10 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class DetailDetailComponent implements OnInit {
     private readonly service = inject(MovementDetailService);
     private readonly route = inject(ActivatedRoute);
+    private readonly toast = inject(ToastService);
 
     id = Number(this.route.snapshot.paramMap.get('id'));
     loading = signal(true);
-    error = signal('');
     item = signal<MovementDetail | null>(null);
 
     ngOnInit(): void {
@@ -72,7 +71,7 @@ export class DetailDetailComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'No se pudo cargar el detalle.'));
+                this.toast.error(extractErrorMessage(err, 'No se pudo cargar el detalle.'));
                 this.loading.set(false);
             },
         });

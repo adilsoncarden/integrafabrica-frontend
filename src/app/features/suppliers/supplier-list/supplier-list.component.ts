@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SupplierService } from '../../../core/services/supplier.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Supplier } from '../../../core/models/supplier.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -23,10 +24,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         <app-page-header title="Proveedores" subtitle="Gestión de proveedores">
             <a routerLink="/admin/proveedores/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
-
-        @if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
-        }
 
         @if (loading()) {
             <app-loading-spinner />
@@ -80,9 +77,9 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class SupplierListComponent implements OnInit {
     private readonly service = inject(SupplierService);
     private readonly confirmDialog = inject(ConfirmDialogService);
+    private readonly toast = inject(ToastService);
 
     loading = signal(true);
-    error = signal('');
     items = signal<Supplier[]>([]);
     currentPage = signal(0);
     pageSize = signal(10);
@@ -94,7 +91,6 @@ export class SupplierListComponent implements OnInit {
 
     load(): void {
         this.loading.set(true);
-        this.error.set('');
         this.service.getPage(this.currentPage(), this.pageSize()).subscribe({
             next: (page) => {
                 this.items.set(page.content);
@@ -102,7 +98,7 @@ export class SupplierListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar proveedores.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar proveedores.'));
                 this.loading.set(false);
             },
         });
@@ -123,8 +119,11 @@ export class SupplierListComponent implements OnInit {
         if (!confirmed) return;
 
         this.service.delete(item.id).subscribe({
-            next: () => this.load(),
-            error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
+            next: () => {
+                this.toast.success(`Proveedor "${item.company_name}" eliminado.`);
+                this.load();
+            },
+            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
 }

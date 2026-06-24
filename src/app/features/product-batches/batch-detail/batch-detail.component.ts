@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { ProductBatchService } from '../../../core/services/product-batch.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { ProductBatch } from '../../../core/models/product-batch.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -19,8 +20,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
         } @else if (item(); as b) {
             <div class="glass-card">
                 <div class="detail-row"><span class="label">ID</span><span>{{ b.id }}</span></div>
@@ -52,10 +51,10 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class BatchDetailComponent implements OnInit {
     private readonly service = inject(ProductBatchService);
     private readonly route = inject(ActivatedRoute);
+    private readonly toast = inject(ToastService);
 
     id = Number(this.route.snapshot.paramMap.get('id'));
     loading = signal(true);
-    error = signal('');
     item = signal<ProductBatch | null>(null);
 
     ngOnInit(): void {
@@ -65,7 +64,7 @@ export class BatchDetailComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'No se pudo cargar el lote.'));
+                this.toast.error(extractErrorMessage(err, 'No se pudo cargar el lote.'));
                 this.loading.set(false);
             },
         });

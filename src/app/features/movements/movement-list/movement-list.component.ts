@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MovementService } from '../../../core/services/movement.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Movement, MovementType } from '../../../core/models/movement.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -40,10 +41,6 @@ type FilterTab = 'ALL' | MovementType;
                 </button>
             }
         </div>
-
-        @if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
-        }
 
         @if (loading()) {
             <app-loading-spinner />
@@ -124,9 +121,9 @@ type FilterTab = 'ALL' | MovementType;
 export class MovementListComponent implements OnInit {
     private readonly service = inject(MovementService);
     private readonly confirmDialog = inject(ConfirmDialogService);
+    private readonly toast = inject(ToastService);
 
     loading = signal(true);
-    error = signal('');
     activeTab = signal<FilterTab>('ALL');
     items = signal<Movement[]>([]);
     currentPage = signal(0);
@@ -152,7 +149,6 @@ export class MovementListComponent implements OnInit {
 
     load(): void {
         this.loading.set(true);
-        this.error.set('');
 
         const tab = this.activeTab();
         const request =
@@ -167,7 +163,7 @@ export class MovementListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar movimientos.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar movimientos.'));
                 this.loading.set(false);
             },
         });
@@ -201,8 +197,11 @@ export class MovementListComponent implements OnInit {
         if (!confirmed) return;
 
         this.service.delete(item.id).subscribe({
-            next: () => this.load(),
-            error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
+            next: () => {
+                this.toast.success(`Movimiento #${item.id} eliminado.`);
+                this.load();
+            },
+            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
 }

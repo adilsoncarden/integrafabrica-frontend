@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { CategoryService } from '../../../core/services/category.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Category } from '../../../core/models/category.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -25,10 +26,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         <app-page-header title="Categorías" subtitle="Gestión de categorías de productos">
             <a routerLink="/admin/categorias/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
-
-        @if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
-        }
 
         @if (loading()) {
             <app-loading-spinner />
@@ -88,9 +85,9 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class CategoryListComponent implements OnInit {
     private readonly service = inject(CategoryService);
     private readonly confirmDialog = inject(ConfirmDialogService);
+    private readonly toast = inject(ToastService);
 
     loading = signal(true);
-    error = signal('');
     items = signal<Category[]>([]);
     currentPage = signal(0);
     pageSize = signal(10);
@@ -102,7 +99,6 @@ export class CategoryListComponent implements OnInit {
 
     load(): void {
         this.loading.set(true);
-        this.error.set('');
         this.service.getPage(this.currentPage(), this.pageSize()).subscribe({
             next: (page) => {
                 this.items.set(page.content);
@@ -110,7 +106,7 @@ export class CategoryListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar categorías.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar categorías.'));
                 this.loading.set(false);
             },
         });
@@ -131,8 +127,11 @@ export class CategoryListComponent implements OnInit {
         if (!confirmed) return;
 
         this.service.delete(item.id).subscribe({
-            next: () => this.load(),
-            error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
+            next: () => {
+                this.toast.success(`Categoría "${item.name}" eliminada.`);
+                this.load();
+            },
+            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
 }

@@ -4,6 +4,7 @@ import { DatePipe } from '@angular/common';
 import { MovementService } from '../../../core/services/movement.service';
 import { MovementDetailService } from '../../../core/services/movement-detail.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Movement } from '../../../core/models/movement.model';
 import { MovementDetail } from '../../../core/models/movement-detail.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -22,8 +23,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
         } @else if (item(); as m) {
             <div class="glass-card">
                 <div class="detail-row"><span class="label">ID</span><span>{{ m.id }}</span></div>
@@ -116,11 +115,11 @@ export class MovementDetailComponent implements OnInit {
     private readonly detailService = inject(MovementDetailService);
     private readonly confirmDialog = inject(ConfirmDialogService);
     private readonly route = inject(ActivatedRoute);
+    private readonly toast = inject(ToastService);
 
     id = Number(this.route.snapshot.paramMap.get('id'));
     loading = signal(true);
     detailsLoading = signal(true);
-    error = signal('');
     item = signal<Movement | null>(null);
     details = signal<MovementDetail[]>([]);
 
@@ -132,7 +131,7 @@ export class MovementDetailComponent implements OnInit {
                 this.loadDetails();
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'No se pudo cargar el movimiento.'));
+                this.toast.error(extractErrorMessage(err, 'No se pudo cargar el movimiento.'));
                 this.loading.set(false);
             },
         });
@@ -146,7 +145,7 @@ export class MovementDetailComponent implements OnInit {
                 this.detailsLoading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar detalles.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar detalles.'));
                 this.detailsLoading.set(false);
             },
         });
@@ -175,8 +174,11 @@ export class MovementDetailComponent implements OnInit {
         if (!confirmed) return;
 
         this.detailService.delete(d.id).subscribe({
-            next: () => this.loadDetails(),
-            error: (err) => this.error.set(extractErrorMessage(err, 'Error al eliminar.')),
+            next: () => {
+                this.toast.success(`Línea #${d.id} eliminada.`);
+                this.loadDetails();
+            },
+            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
         });
     }
 }

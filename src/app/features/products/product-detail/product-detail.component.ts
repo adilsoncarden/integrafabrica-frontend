@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { ProductService } from '../../../core/services/product.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Product } from '../../../core/models/product.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -19,8 +20,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
         } @else if (item(); as p) {
             <div class="glass-card">
                 <div class="detail-row"><span class="label">ID</span><span>{{ p.id }}</span></div>
@@ -59,10 +58,10 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class ProductDetailComponent implements OnInit {
     private readonly service = inject(ProductService);
     private readonly route = inject(ActivatedRoute);
+    private readonly toast = inject(ToastService);
 
     id = Number(this.route.snapshot.paramMap.get('id'));
     loading = signal(true);
-    error = signal('');
     item = signal<Product | null>(null);
 
     ngOnInit(): void {
@@ -72,7 +71,7 @@ export class ProductDetailComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'No se pudo cargar el producto.'));
+                this.toast.error(extractErrorMessage(err, 'No se pudo cargar el producto.'));
                 this.loading.set(false);
             },
         });

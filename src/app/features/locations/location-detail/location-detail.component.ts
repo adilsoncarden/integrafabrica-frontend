@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { LocationService } from '../../../core/services/location.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Location } from '../../../core/models/location.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -19,8 +20,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (error()) {
-            <div class="alert alert-error">{{ error() }}</div>
         } @else if (item(); as loc) {
             <div class="glass-card">
                 <div class="detail-row"><span class="label">ID</span><span>{{ loc.id }}</span></div>
@@ -45,10 +44,10 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 export class LocationDetailComponent implements OnInit {
     private readonly service = inject(LocationService);
     private readonly route = inject(ActivatedRoute);
+    private readonly toast = inject(ToastService);
 
     id = Number(this.route.snapshot.paramMap.get('id'));
     loading = signal(true);
-    error = signal('');
     item = signal<Location | null>(null);
 
     ngOnInit(): void {
@@ -58,7 +57,7 @@ export class LocationDetailComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'No se pudo cargar la ubicación.'));
+                this.toast.error(extractErrorMessage(err, 'No se pudo cargar la ubicación.'));
                 this.loading.set(false);
             },
         });

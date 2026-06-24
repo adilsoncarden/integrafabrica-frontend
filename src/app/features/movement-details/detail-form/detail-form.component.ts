@@ -6,6 +6,7 @@ import { MovementDetailService } from '../../../core/services/movement-detail.se
 import { MovementService } from '../../../core/services/movement.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ProductBatchService } from '../../../core/services/product-batch.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Movement } from '../../../core/models/movement.model';
 import { Product } from '../../../core/models/product.model';
 import { ProductBatch } from '../../../core/models/product-batch.model';
@@ -26,10 +27,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         @if (loading()) {
             <app-loading-spinner />
         } @else {
-            @if (error()) {
-                <div class="alert alert-error">{{ error() }}</div>
-            }
-
             <form class="glass-card" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="form-grid">
                     <div class="form-group">
@@ -83,12 +80,12 @@ export class DetailFormComponent implements OnInit {
     private readonly batchService = inject(ProductBatchService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly toast = inject(ToastService);
 
     isEdit = false;
     editId: number | null = null;
     loading = signal(true);
     saving = signal(false);
-    error = signal('');
     movements = signal<Movement[]>([]);
     products = signal<Product[]>([]);
     batches = signal<ProductBatch[]>([]);
@@ -151,7 +148,7 @@ export class DetailFormComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar datos.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar datos.'));
                 this.loading.set(false);
             },
         });
@@ -163,7 +160,6 @@ export class DetailFormComponent implements OnInit {
         if (v.movement_id == null || v.product_id == null) return;
 
         this.saving.set(true);
-        this.error.set('');
         const request = {
             movement_id: v.movement_id,
             product_id: v.product_id,
@@ -176,9 +172,12 @@ export class DetailFormComponent implements OnInit {
                 : this.detailService.create(request);
 
         op.subscribe({
-            next: () => this.router.navigate(['/admin/detalles-movimiento']),
+            next: () => {
+                this.toast.success(this.isEdit ? 'Línea actualizada.' : 'Línea creada.');
+                this.router.navigate(['/admin/detalles-movimiento']);
+            },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
                 this.saving.set(false);
             },
         });

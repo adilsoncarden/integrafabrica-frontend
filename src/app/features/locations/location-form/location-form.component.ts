@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LocationService } from '../../../core/services/location.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { extractErrorMessage } from '../../../core/utils/error.util';
@@ -19,10 +20,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         @if (loading()) {
             <app-loading-spinner />
         } @else {
-            @if (error()) {
-                <div class="alert alert-error">{{ error() }}</div>
-            }
-
             <form class="glass-card" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="form-grid">
                     <div class="form-group">
@@ -58,12 +55,12 @@ export class LocationFormComponent implements OnInit {
     private readonly service = inject(LocationService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly toast = inject(ToastService);
 
     isEdit = false;
     editId: number | null = null;
     loading = signal(false);
     saving = signal(false);
-    error = signal('');
 
     form = this.fb.nonNullable.group({
         aisle: ['', [Validators.required, Validators.maxLength(50)]],
@@ -89,7 +86,7 @@ export class LocationFormComponent implements OnInit {
                     this.loading.set(false);
                 },
                 error: (err) => {
-                    this.error.set(extractErrorMessage(err, 'No se pudo cargar la ubicación.'));
+                    this.toast.error(extractErrorMessage(err, 'No se pudo cargar la ubicación.'));
                     this.loading.set(false);
                 },
             });
@@ -99,7 +96,6 @@ export class LocationFormComponent implements OnInit {
     onSubmit(): void {
         if (this.form.invalid) return;
         this.saving.set(true);
-        this.error.set('');
         const request = {
             aisle: this.form.controls.aisle.value,
             rack: this.form.controls.rack.value,
@@ -112,9 +108,12 @@ export class LocationFormComponent implements OnInit {
                 : this.service.create(request);
 
         op.subscribe({
-            next: () => this.router.navigate(['/admin/ubicaciones']),
+            next: () => {
+                this.toast.success(this.isEdit ? 'Ubicación actualizada.' : 'Ubicación creada.');
+                this.router.navigate(['/admin/ubicaciones']);
+            },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
                 this.saving.set(false);
             },
         });

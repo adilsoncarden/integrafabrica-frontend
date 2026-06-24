@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ProductBatchService } from '../../../core/services/product-batch.service';
 import { ProductService } from '../../../core/services/product.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Product } from '../../../core/models/product.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -22,10 +23,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         @if (loading()) {
             <app-loading-spinner />
         } @else {
-            @if (error()) {
-                <div class="alert alert-error">{{ error() }}</div>
-            }
-
             <form class="glass-card" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="form-grid">
                     <div class="form-group">
@@ -71,12 +68,12 @@ export class BatchFormComponent implements OnInit {
     private readonly productService = inject(ProductService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly toast = inject(ToastService);
 
     isEdit = false;
     editId: number | null = null;
     loading = signal(true);
     saving = signal(false);
-    error = signal('');
     products = signal<Product[]>([]);
 
     form = this.fb.group({
@@ -115,7 +112,7 @@ export class BatchFormComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al cargar datos.'));
+                this.toast.error(extractErrorMessage(err, 'Error al cargar datos.'));
                 this.loading.set(false);
             },
         });
@@ -127,7 +124,6 @@ export class BatchFormComponent implements OnInit {
         if (v.product_id == null) return;
 
         this.saving.set(true);
-        this.error.set('');
         const request = {
             product_id: v.product_id,
             batch_code: v.batch_code!,
@@ -141,9 +137,12 @@ export class BatchFormComponent implements OnInit {
                 : this.batchService.create(request);
 
         op.subscribe({
-            next: () => this.router.navigate(['/admin/lotes']),
+            next: () => {
+                this.toast.success(this.isEdit ? 'Lote actualizado.' : 'Lote creado.');
+                this.router.navigate(['/admin/lotes']);
+            },
             error: (err) => {
-                this.error.set(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
                 this.saving.set(false);
             },
         });

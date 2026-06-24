@@ -1,0 +1,27 @@
+@import 'sweetalert2/dist/sweetalert2.min.css';
+
+.wms-swal-popup {
+    font-family: var(--font-family) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-card) !important;
+    padding: 1.5rem !important;
+}
+
+.wms-swal-title {
+    color: var(--color-text-primary) !important;
+    font-size: var(--font-size-lg) !important;
+    font-weight: 700 !important;
+}
+
+.wms-swal-text {
+    color: var(--color-text-secondary) !important;
+    font-size: var(--font-size-sm) !important;
+}
+
+.wms-swal-confirm,
+.wms-swal-cancel {
+    border-radius: var(--radius-md) !important;
+    font-weight: 600 !important;
+    font-size: var(--font-size-sm) !important;
+    padding: 0.5rem 1.25rem !important;
+}
