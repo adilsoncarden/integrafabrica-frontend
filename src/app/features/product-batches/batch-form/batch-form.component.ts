@@ -26,6 +26,10 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
             <form class="glass-card" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="form-grid">
                     <div class="form-group">
+                        <label for="batch_code">Código de lote *</label>
+                        <input id="batch_code" type="text" formControlName="batch_code" maxlength="100" />
+                    </div>
+                    <div class="form-group">
                         <label for="product_id">Producto *</label>
                         <select id="product_id" formControlName="product_id">
                             <option [ngValue]="null" disabled>Seleccionar...</option>
@@ -33,10 +37,6 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                                 <option [ngValue]="p.id">{{ p.name }} ({{ p.sku }})</option>
                             }
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="batch_code">Código de lote *</label>
-                        <input id="batch_code" type="text" formControlName="batch_code" maxlength="100" />
                     </div>
                     <div class="form-group">
                         <label for="expiration_date">Fecha de vencimiento *</label>
