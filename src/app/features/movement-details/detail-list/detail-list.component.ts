@@ -1,7 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { MovementService } from '../../../core/services/movement.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { MovementDetailService } from '../../../core/services/movement-detail.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -9,7 +8,9 @@ import { MovementDetail } from '../../../core/models/movement-detail.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
+import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
+import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
 
 @Component({
     selector: 'app-detail-list',
@@ -19,6 +20,7 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         PageHeaderComponent,
         LoadingSpinnerComponent,
         EmptyStateComponent,
+        PaginationNavComponent,
     ],
     template: `
         <app-page-header title="Detalles de movimiento" subtitle="Líneas de productos en movimientos">
@@ -27,7 +29,7 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 
         @if (loading()) {
             <app-loading-spinner />
-        } @else if (items().length === 0) {
+        } @else if (totalElements() === 0) {
             <app-empty-state icon="📝" title="Sin detalles" message="No hay líneas de movimiento registradas.">
                 <a routerLink="/admin/detalles-movimiento/nuevo" class="btn">+ Nuevo</a>
             </app-empty-state>
@@ -63,51 +65,53 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                         }
                     </tbody>
                 </table>
+                <app-pagination-nav
+                    [currentPage]="currentPage()"
+                    [pageSize]="pageSize()"
+                    [totalElements]="totalElements()"
+                    (pageChange)="changePage($event)"
+                />
             </div>
         }
     `,
     styles: `.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }`,
 })
-export class DetailListComponent implements OnInit {
-    private readonly movementService = inject(MovementService);
+export class DetailListComponent {
+    private readonly authService = inject(AuthService);
     private readonly detailService = inject(MovementDetailService);
     private readonly confirmDialog = inject(ConfirmDialogService);
     private readonly toast = inject(ToastService);
 
     loading = signal(true);
     items = signal<MovementDetail[]>([]);
+    currentPage = signal(0);
+    pageSize = signal(10);
+    totalElements = signal(0);
 
-    ngOnInit(): void {
-        this.load();
+    constructor() {
+        setupAuthGuardedInitialLoad(() => this.load());
     }
 
     load(): void {
         this.loading.set(true);
-        this.movementService.getAll().subscribe({
-            next: (movements) => {
-                if (movements.length === 0) {
-                    this.items.set([]);
-                    this.loading.set(false);
-                    return;
-                }
-                forkJoin(
-                    movements.map((m) => this.detailService.getByMovement(m.id)),
-                ).subscribe({
-                    next: (arrays) => {
-                        this.items.set(arrays.flat());
-                        this.loading.set(false);
-                    },
-                    error: (err) => {
-                        this.toast.error(extractErrorMessage(err, 'Error al cargar detalles.'));
-                        this.loading.set(false);
-                    },
-                });
+        this.detailService.getPage(this.currentPage(), this.pageSize()).subscribe({
+            next: (page) => {
+                this.items.set(page.content);
+                this.totalElements.set(page.totalElements);
+                this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al cargar movimientos.'));
+                if (!shouldSuppressErrorToast(err, this.authService)) {
+                    this.toast.error(extractErrorMessage(err, 'Error al cargar detalles.'));
+                }
                 this.loading.set(false);
             },
         });
+    }
+
+    changePage(page: number): void {
+        this.currentPage.set(page);
+        this.load();
     }
 
     async onDelete(item: MovementDetail): Promise<void> {

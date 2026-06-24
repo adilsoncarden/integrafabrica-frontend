@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guards';
+import { authReadyResolver } from './core/resolvers/auth-ready.resolver';
 
 export const routes: Routes = [
     {
@@ -12,6 +13,7 @@ export const routes: Routes = [
     {
         path: 'admin',
         canActivate: [authGuard],
+        resolve: { authReady: authReadyResolver },
         loadComponent: () =>
             import('./layouts/main-layout/main-layout.component').then(
                 (m) => m.MainLayoutComponent,

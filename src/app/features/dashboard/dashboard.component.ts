@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { DashboardService, DashboardData } from '../../core/services/dashboard.service';
@@ -6,7 +6,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
-import { extractErrorMessage } from '../../core/utils/error.util';
+import { extractErrorMessage, shouldSuppressErrorToast } from '../../core/utils/error.util';
+import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
 
 @Component({
     selector: 'app-dashboard',
@@ -202,7 +203,7 @@ import { extractErrorMessage } from '../../core/utils/error.util';
         }
     `,
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
     private readonly dashboardService = inject(DashboardService);
     private readonly toast = inject(ToastService);
     readonly authService = inject(AuthService);
@@ -210,14 +211,21 @@ export class DashboardComponent implements OnInit {
     loading = signal(true);
     data = signal<DashboardData | null>(null);
 
-    ngOnInit(): void {
+    constructor() {
+        setupAuthGuardedInitialLoad(() => this.loadDashboard());
+    }
+
+    private loadDashboard(): void {
+        this.loading.set(true);
         this.dashboardService.loadDashboard().subscribe({
             next: (d) => {
                 this.data.set(d);
                 this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'No se pudo cargar el dashboard.'));
+                if (!shouldSuppressErrorToast(err, this.authService)) {
+                    this.toast.error(extractErrorMessage(err, 'No se pudo cargar el dashboard.'));
+                }
                 this.loading.set(false);
             },
         });

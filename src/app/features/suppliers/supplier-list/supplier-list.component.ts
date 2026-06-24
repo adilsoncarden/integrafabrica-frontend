@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SupplierService } from '../../../core/services/supplier.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Supplier } from '../../../core/models/supplier.model';
@@ -8,7 +9,8 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
+import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
 
 @Component({
     selector: 'app-supplier-list',
@@ -74,8 +76,9 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
     `,
     styles: `.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }`,
 })
-export class SupplierListComponent implements OnInit {
+export class SupplierListComponent {
     private readonly service = inject(SupplierService);
+    private readonly authService = inject(AuthService);
     private readonly confirmDialog = inject(ConfirmDialogService);
     private readonly toast = inject(ToastService);
 
@@ -85,8 +88,8 @@ export class SupplierListComponent implements OnInit {
     pageSize = signal(10);
     totalElements = signal(0);
 
-    ngOnInit(): void {
-        this.load();
+    constructor() {
+        setupAuthGuardedInitialLoad(() => this.load());
     }
 
     load(): void {
@@ -98,7 +101,9 @@ export class SupplierListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al cargar proveedores.'));
+                if (!shouldSuppressErrorToast(err, this.authService)) {
+                    this.toast.error(extractErrorMessage(err, 'Error al cargar proveedores.'));
+                }
                 this.loading.set(false);
             },
         });

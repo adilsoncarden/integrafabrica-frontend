@@ -12,12 +12,17 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((error: HttpErrorResponse) => {
             const isAuthLogin = req.url.includes('/auth/login');
 
-            if (error.status === 401 && !isAuthLogin) {
+            if (error.status === 401 && !isAuthLogin && authService.isAuthReady()) {
                 authService.logout();
                 router.navigate(['/login']);
             }
 
-            if (error.status === 403 && !isAuthLogin && authService.getToken()) {
+            if (
+                error.status === 403 &&
+                !isAuthLogin &&
+                authService.isAuthReady() &&
+                authService.getToken()
+            ) {
                 authService.logout();
                 router.navigate(['/login']);
             }

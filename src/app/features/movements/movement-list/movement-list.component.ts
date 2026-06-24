@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MovementService } from '../../../core/services/movement.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Movement, MovementType } from '../../../core/models/movement.model';
@@ -9,7 +10,8 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
+import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
 
 type FilterTab = 'ALL' | MovementType;
 
@@ -118,8 +120,9 @@ type FilterTab = 'ALL' | MovementType;
         .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
     `,
 })
-export class MovementListComponent implements OnInit {
+export class MovementListComponent {
     private readonly service = inject(MovementService);
+    private readonly authService = inject(AuthService);
     private readonly confirmDialog = inject(ConfirmDialogService);
     private readonly toast = inject(ToastService);
 
@@ -137,8 +140,8 @@ export class MovementListComponent implements OnInit {
         { value: 'MERMA', label: 'Merma' },
     ];
 
-    ngOnInit(): void {
-        this.load();
+    constructor() {
+        setupAuthGuardedInitialLoad(() => this.load());
     }
 
     setTab(tab: FilterTab): void {
@@ -163,7 +166,9 @@ export class MovementListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al cargar movimientos.'));
+                if (!shouldSuppressErrorToast(err, this.authService)) {
+                    this.toast.error(extractErrorMessage(err, 'Error al cargar movimientos.'));
+                }
                 this.loading.set(false);
             },
         });

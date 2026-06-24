@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { CategoryService } from '../../../core/services/category.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Category } from '../../../core/models/category.model';
@@ -9,7 +10,8 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
+import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
 
 @Component({
     selector: 'app-category-list',
@@ -82,8 +84,9 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
         }
     `,
 })
-export class CategoryListComponent implements OnInit {
+export class CategoryListComponent {
     private readonly service = inject(CategoryService);
+    private readonly authService = inject(AuthService);
     private readonly confirmDialog = inject(ConfirmDialogService);
     private readonly toast = inject(ToastService);
 
@@ -93,8 +96,8 @@ export class CategoryListComponent implements OnInit {
     pageSize = signal(10);
     totalElements = signal(0);
 
-    ngOnInit(): void {
-        this.load();
+    constructor() {
+        setupAuthGuardedInitialLoad(() => this.load());
     }
 
     load(): void {
@@ -106,7 +109,9 @@ export class CategoryListComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al cargar categorías.'));
+                if (!shouldSuppressErrorToast(err, this.authService)) {
+                    this.toast.error(extractErrorMessage(err, 'Error al cargar categorías.'));
+                }
                 this.loading.set(false);
             },
         });
