@@ -1,0 +1,75 @@
+<div class="login-wrapper">
+    <div class="login-card">
+        <header class="login-header">
+            <div class="brand-icon">
+                <i class="bi bi-box-seam-fill" aria-hidden="true"></i>
+            </div>
+            <h1 class="brand-name">WMS Intranet</h1>
+            <p class="brand-subtitle">Sistema de Gestión de Almacén</p>
+        </header>
+
+        <form
+            [formGroup]="loginForm"
+            (ngSubmit)="onSubmit()"
+            class="login-form"
+        >
+            <h2 class="form-title">Iniciar Sesión</h2>
+
+            <div class="input-group-custom">
+                <label for="identifier">USUARIO / EMAIL</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-person input-icon" aria-hidden="true"></i>
+                    <input
+                        id="identifier"
+                        type="text"
+                        formControlName="identifier"
+                        placeholder="admin_user / admin@manufactura.com"
+                    />
+                </div>
+            </div>
+
+            <div class="input-group-custom">
+                <label for="password">CONTRASEÑA</label>
+                <div class="input-wrapper input-wrapper--password">
+                    <i class="bi bi-lock input-icon" aria-hidden="true"></i>
+                    <input
+                        id="password"
+                        [type]="showPassword() ? 'text' : 'password'"
+                        formControlName="password"
+                        placeholder="••••••••"
+                    />
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        (click)="togglePasswordVisibility()"
+                        [attr.aria-label]="
+                            showPassword()
+                                ? 'Ocultar contraseña'
+                                : 'Mostrar contraseña'
+                        "
+                    >
+                        @if (showPassword()) {
+                            <i class="bi bi-eye-slash" aria-hidden="true"></i>
+                        } @else {
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                        }
+                    </button>
+                </div>
+            </div>
+
+            <button
+                type="submit"
+                class="btn-login"
+                [disabled]="loginForm.invalid"
+            >
+                <span>Ingresar al Sistema</span>
+            </button>
+
+            <footer class="form-footer">
+                <p>
+                    ¿Olvidaste tu contraseña? <a href="#">Contactar soporte</a>
+                </p>
+            </footer>
+        </form>
+    </div>
+</div>

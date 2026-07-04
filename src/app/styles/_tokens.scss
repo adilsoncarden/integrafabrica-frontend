@@ -1,0 +1,53 @@
+:root {
+    --color-bg-start: #f8fafc;
+    --color-bg-end: #f1f5f9;
+    --color-bg-gradient: linear-gradient(
+        135deg,
+        var(--color-bg-start) 0%,
+        var(--color-bg-end) 100%
+    );
+    --color-surface: #ffffff;
+    --color-surface-hover: #ffffff;
+    --color-input-bg: #ffffff;
+    --color-primary: #4f46e5;
+    --color-primary-hover: #4338ca;
+    --color-accent: #6366f1;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #64748b;
+    --color-text-placeholder: #94a3b8;
+    --color-text-on-primary: #ffffff;
+    --color-error: #ef4444;
+    --color-error-text: #dc2626;
+    --color-success: #16a34a;
+    --color-success-text: #15803d;
+    --color-warning: #d97706;
+    --color-warning-text: #b45309;
+    --color-info: #4f46e5;
+    --color-border: #e2e8f0;
+    --color-border-input: #cbd5e1;
+    --shadow-card:
+        0 4px 6px -1px rgba(15, 23, 42, 0.08),
+        0 10px 15px -3px rgba(15, 23, 42, 0.06);
+    --shadow-button: 0 4px 14px rgba(79, 70, 229, 0.35);
+    --shadow-sidebar: 2px 0 12px rgba(15, 23, 42, 0.06);
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --font-family: "Inter", system-ui, -apple-system, sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.875rem;
+    --font-size-2xl: 2.25rem;
+    --sidebar-width: 260px;
+    --sidebar-collapsed: 72px;
+    --navbar-height: 64px;
+    --footer-height: 48px;
+}
