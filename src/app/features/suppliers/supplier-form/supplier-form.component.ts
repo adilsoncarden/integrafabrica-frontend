@@ -1,20 +1,29 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { SupplierService } from '../../../core/services/supplier.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
+import { SupplierService } from "../../../core/services/supplier.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { extractErrorMessage } from "../../../core/utils/error.util";
 
 @Component({
-    selector: 'app-supplier-form',
+    selector: "app-supplier-form",
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink, PageHeaderComponent, LoadingSpinnerComponent],
+    imports: [
+        ReactiveFormsModule,
+        RouterLink,
+        PageHeaderComponent,
+        LoadingSpinnerComponent,
+    ],
     template: `
         <app-page-header
             [title]="isEdit ? 'Editar proveedor' : 'Nuevo proveedor'"
-            [subtitle]="isEdit ? 'Modifica los datos del proveedor' : 'Registra un nuevo proveedor'"
+            [subtitle]="
+                isEdit
+                    ? 'Modifica los datos del proveedor'
+                    : 'Registra un nuevo proveedor'
+            "
         />
 
         @if (loading()) {
@@ -24,15 +33,30 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="ruc">RUC *</label>
-                        <input id="ruc" type="text" formControlName="ruc" maxlength="11" />
+                        <input
+                            id="ruc"
+                            type="text"
+                            formControlName="ruc"
+                            maxlength="11"
+                        />
                     </div>
                     <div class="form-group">
                         <label for="company_name">Razón social *</label>
-                        <input id="company_name" type="text" formControlName="company_name" maxlength="150" />
+                        <input
+                            id="company_name"
+                            type="text"
+                            formControlName="company_name"
+                            maxlength="150"
+                        />
                     </div>
                     <div class="form-group">
                         <label for="contact_name">Contacto</label>
-                        <input id="contact_name" type="text" formControlName="contact_name" maxlength="100" />
+                        <input
+                            id="contact_name"
+                            type="text"
+                            formControlName="contact_name"
+                            maxlength="100"
+                        />
                     </div>
                     <div class="form-group">
                         <label for="phone">Teléfono</label>
@@ -40,23 +64,53 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input id="email" type="email" formControlName="email" maxlength="100" />
+                        <input
+                            id="email"
+                            type="email"
+                            formControlName="email"
+                            maxlength="100"
+                        />
                     </div>
                     <div class="form-group">
-                        <label for="delivery_time_days">Tiempo de entrega (días) *</label>
-                        <input id="delivery_time_days" type="number" formControlName="delivery_time_days" min="0" />
+                        <label for="delivery_time_days"
+                            >Tiempo de entrega (días) *</label
+                        >
+                        <input
+                            id="delivery_time_days"
+                            type="number"
+                            formControlName="delivery_time_days"
+                            min="0"
+                        />
                     </div>
                 </div>
                 <div class="form-actions">
-                    <a routerLink="/admin/proveedores" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn" [disabled]="form.invalid || saving()">
-                        {{ saving() ? 'Guardando...' : isEdit ? 'Actualizar' : 'Crear' }}
+                    <a routerLink="/admin/proveedores" class="btn btn-secondary"
+                        >Cancelar</a
+                    >
+                    <button
+                        type="submit"
+                        class="btn"
+                        [disabled]="form.invalid || saving()"
+                    >
+                        {{
+                            saving()
+                                ? "Guardando..."
+                                : isEdit
+                                  ? "Actualizar"
+                                  : "Crear"
+                        }}
                     </button>
                 </div>
             </form>
         }
     `,
-    styles: `.form-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }`,
+    styles: `
+        .form-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+    `,
 })
 export class SupplierFormComponent implements OnInit {
     private readonly fb = inject(FormBuilder);
@@ -71,16 +125,16 @@ export class SupplierFormComponent implements OnInit {
     saving = signal(false);
 
     form = this.fb.nonNullable.group({
-        ruc: ['', [Validators.required, Validators.pattern(/^[0-9]{11}$/)]],
-        company_name: ['', [Validators.required, Validators.maxLength(150)]],
-        contact_name: ['', Validators.maxLength(100)],
-        phone: [''],
-        email: ['', [Validators.email, Validators.maxLength(100)]],
+        ruc: ["", [Validators.required, Validators.pattern(/^[0-9]{11}$/)]],
+        company_name: ["", [Validators.required, Validators.maxLength(150)]],
+        contact_name: ["", Validators.maxLength(100)],
+        phone: [""],
+        email: ["", [Validators.email, Validators.maxLength(100)]],
         delivery_time_days: [0, [Validators.required, Validators.min(0)]],
     });
 
     ngOnInit(): void {
-        const idParam = this.route.snapshot.paramMap.get('id');
+        const idParam = this.route.snapshot.paramMap.get("id");
         if (idParam) {
             this.isEdit = true;
             this.editId = Number(idParam);
@@ -90,15 +144,20 @@ export class SupplierFormComponent implements OnInit {
                     this.form.patchValue({
                         ruc: s.ruc,
                         company_name: s.company_name,
-                        contact_name: s.contact_name ?? '',
-                        phone: s.phone ?? '',
-                        email: s.email ?? '',
+                        contact_name: s.contact_name ?? "",
+                        phone: s.phone ?? "",
+                        email: s.email ?? "",
                         delivery_time_days: s.delivery_time_days,
                     });
                     this.loading.set(false);
                 },
                 error: (err) => {
-                    this.toast.error(extractErrorMessage(err, 'No se pudo cargar el proveedor.'));
+                    this.toast.error(
+                        extractErrorMessage(
+                            err,
+                            "No se pudo cargar el proveedor.",
+                        ),
+                    );
                     this.loading.set(false);
                 },
             });
@@ -112,7 +171,7 @@ export class SupplierFormComponent implements OnInit {
         const request = {
             ruc: v.ruc,
             company_name: v.company_name,
-            contact_name: v.contact_name || '',
+            contact_name: v.contact_name || "",
             phone: v.phone || undefined,
             email: v.email || undefined,
             delivery_time_days: v.delivery_time_days,
@@ -124,11 +183,15 @@ export class SupplierFormComponent implements OnInit {
 
         op.subscribe({
             next: () => {
-                this.toast.success(this.isEdit ? 'Proveedor actualizado.' : 'Proveedor creado.');
-                this.router.navigate(['/admin/proveedores']);
+                this.toast.success(
+                    this.isEdit
+                        ? "Proveedor actualizado."
+                        : "Proveedor creado.",
+                );
+                this.router.navigate(["/admin/proveedores"]);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, "Error al guardar."));
                 this.saving.set(false);
             },
         });

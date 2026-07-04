@@ -1,22 +1,25 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { MovementService } from '../../../core/services/movement.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Movement, MovementType } from '../../../core/models/movement.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
-import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
-import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
+import { Component, inject, signal } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { DatePipe } from "@angular/common";
+import { MovementService } from "../../../core/services/movement.service";
+import { AuthService } from "../../../core/services/auth.service";
+import { ConfirmDialogService } from "../../../core/services/confirm-dialog.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Movement, MovementType } from "../../../core/models/movement.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { EmptyStateComponent } from "../../../shared/components/empty-state/empty-state.component";
+import { PaginationNavComponent } from "../../../shared/components/pagination-nav/pagination-nav.component";
+import {
+    extractErrorMessage,
+    shouldSuppressErrorToast,
+} from "../../../core/utils/error.util";
+import { setupAuthGuardedInitialLoad } from "../../../core/utils/auth-ready.util";
 
-type FilterTab = 'ALL' | MovementType;
+type FilterTab = "ALL" | MovementType;
 
 @Component({
-    selector: 'app-movement-list',
+    selector: "app-movement-list",
     standalone: true,
     imports: [
         RouterLink,
@@ -27,7 +30,10 @@ type FilterTab = 'ALL' | MovementType;
         PaginationNavComponent,
     ],
     template: `
-        <app-page-header title="Movimientos" subtitle="Entradas, salidas y mermas">
+        <app-page-header
+            title="Movimientos"
+            subtitle="Entradas, salidas y mermas"
+        >
             <a routerLink="/admin/movimientos/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
 
@@ -47,7 +53,11 @@ type FilterTab = 'ALL' | MovementType;
         @if (loading()) {
             <app-loading-spinner />
         } @else if (totalElements() === 0) {
-            <app-empty-state icon="🔄" title="Sin movimientos" message="No hay movimientos para este filtro.">
+            <app-empty-state
+                icon="🔄"
+                title="Sin movimientos"
+                message="No hay movimientos para este filtro."
+            >
                 <a routerLink="/admin/movimientos/nuevo" class="btn">+ Nuevo</a>
             </app-empty-state>
         } @else {
@@ -69,18 +79,48 @@ type FilterTab = 'ALL' | MovementType;
                             <tr>
                                 <td>{{ item.id }}</td>
                                 <td>
-                                    <span class="badge" [class]="typeBadge(item.movement_type)">{{
-                                        item.movement_type
-                                    }}</span>
+                                    <span
+                                        class="badge"
+                                        [class]="typeBadge(item.movement_type)"
+                                        >{{ item.movement_type }}</span
+                                    >
                                 </td>
                                 <td>{{ item.reason }}</td>
-                                <td>{{ item.supplier?.company_name || '—' }}</td>
+                                <td>
+                                    {{ item.supplier?.company_name || "—" }}
+                                </td>
                                 <td>{{ item.performed_by_user }}</td>
-                                <td>{{ item.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                                <td>
+                                    {{
+                                        item.created_at
+                                            | date: "dd/MM/yyyy HH:mm"
+                                    }}
+                                </td>
                                 <td class="actions">
-                                    <a [routerLink]="['/admin/movimientos', item.id]" class="btn-sm btn-secondary">Ver</a>
-                                    <a [routerLink]="['/admin/movimientos', item.id, 'editar']" class="btn-sm btn-secondary">Editar</a>
-                                    <button type="button" class="btn-sm btn-danger" (click)="onDelete(item)">Eliminar</button>
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/movimientos',
+                                            item.id,
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Ver</a
+                                    >
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/movimientos',
+                                            item.id,
+                                            'editar',
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Editar</a
+                                    >
+                                    <button
+                                        type="button"
+                                        class="btn-sm btn-danger"
+                                        (click)="onDelete(item)"
+                                    >
+                                        Eliminar
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -117,7 +157,11 @@ type FilterTab = 'ALL' | MovementType;
             border-color: var(--color-accent);
             color: var(--color-text-primary);
         }
-        .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
     `,
 })
 export class MovementListComponent {
@@ -127,17 +171,17 @@ export class MovementListComponent {
     private readonly toast = inject(ToastService);
 
     loading = signal(true);
-    activeTab = signal<FilterTab>('ALL');
+    activeTab = signal<FilterTab>("ALL");
     items = signal<Movement[]>([]);
     currentPage = signal(0);
     pageSize = signal(10);
     totalElements = signal(0);
 
     tabs: { value: FilterTab; label: string }[] = [
-        { value: 'ALL', label: 'Todos' },
-        { value: 'ENTRADA', label: 'Entrada' },
-        { value: 'SALIDA', label: 'Salida' },
-        { value: 'MERMA', label: 'Merma' },
+        { value: "ALL", label: "Todos" },
+        { value: "ENTRADA", label: "Entrada" },
+        { value: "SALIDA", label: "Salida" },
+        { value: "MERMA", label: "Merma" },
     ];
 
     constructor() {
@@ -155,9 +199,13 @@ export class MovementListComponent {
 
         const tab = this.activeTab();
         const request =
-            tab === 'ALL'
+            tab === "ALL"
                 ? this.service.getPage(this.currentPage(), this.pageSize())
-                : this.service.getByTypePage(tab, this.currentPage(), this.pageSize());
+                : this.service.getByTypePage(
+                      tab,
+                      this.currentPage(),
+                      this.pageSize(),
+                  );
 
         request.subscribe({
             next: (page) => {
@@ -167,7 +215,12 @@ export class MovementListComponent {
             },
             error: (err) => {
                 if (!shouldSuppressErrorToast(err, this.authService)) {
-                    this.toast.error(extractErrorMessage(err, 'Error al cargar movimientos.'));
+                    this.toast.error(
+                        extractErrorMessage(
+                            err,
+                            "Error al cargar movimientos.",
+                        ),
+                    );
                 }
                 this.loading.set(false);
             },
@@ -181,23 +234,23 @@ export class MovementListComponent {
 
     typeBadge(type: string): string {
         switch (type) {
-            case 'ENTRADA':
-                return 'badge primary';
-            case 'SALIDA':
-                return 'badge success';
-            case 'MERMA':
-                return 'badge danger';
+            case "ENTRADA":
+                return "badge primary";
+            case "SALIDA":
+                return "badge success";
+            case "MERMA":
+                return "badge danger";
             default:
-                return 'badge neutral';
+                return "badge neutral";
         }
     }
 
     async onDelete(item: Movement): Promise<void> {
         const confirmed = await this.confirmDialog.confirm({
-            title: 'Eliminar movimiento',
+            title: "Eliminar movimiento",
             message: `¿Eliminar movimiento #${item.id}?`,
             danger: true,
-            confirmLabel: 'Eliminar',
+            confirmLabel: "Eliminar",
         });
         if (!confirmed) return;
 
@@ -206,7 +259,10 @@ export class MovementListComponent {
                 this.toast.success(`Movimiento #${item.id} eliminado.`);
                 this.load();
             },
-            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
+            error: (err) =>
+                this.toast.error(
+                    extractErrorMessage(err, "Error al eliminar."),
+                ),
         });
     }
 }

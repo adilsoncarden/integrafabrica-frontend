@@ -1,11 +1,14 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { API_URL } from '../config/api.config';
-import { MovementDetail, MovementDetailRequest } from '../models/movement-detail.model';
-import { PageResponse } from '../models/page.model';
+import { Injectable, inject, signal } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable, tap } from "rxjs";
+import { API_URL } from "../config/api.config";
+import {
+    MovementDetail,
+    MovementDetailRequest,
+} from "../models/movement-detail.model";
+import { PageResponse } from "../models/page.model";
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class MovementDetailService {
     private readonly http = inject(HttpClient);
     private readonly base = `${API_URL}/admin/detalles-movimiento`;
@@ -32,8 +35,14 @@ export class MovementDetailService {
         return this.http.post<MovementDetail>(`${this.base}/add`, request);
     }
 
-    update(id: number, request: MovementDetailRequest): Observable<MovementDetail> {
-        return this.http.put<MovementDetail>(`${this.base}/${id}/update`, request);
+    update(
+        id: number,
+        request: MovementDetailRequest,
+    ): Observable<MovementDetail> {
+        return this.http.put<MovementDetail>(
+            `${this.base}/${id}/update`,
+            request,
+        );
     }
 
     delete(id: number): Observable<void> {

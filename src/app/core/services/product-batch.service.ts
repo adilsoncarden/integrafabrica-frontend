@@ -1,13 +1,16 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap } from 'rxjs';
-import { API_URL } from '../config/api.config';
-import { ProductBatch, ProductBatchRequest } from '../models/product-batch.model';
-import { PageResponse } from '../models/page.model';
+import { Injectable, inject, signal } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable, map, tap } from "rxjs";
+import { API_URL } from "../config/api.config";
+import {
+    ProductBatch,
+    ProductBatchRequest,
+} from "../models/product-batch.model";
+import { PageResponse } from "../models/page.model";
 
 const UNPAGED_SIZE = 10_000;
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class ProductBatchService {
     private readonly http = inject(HttpClient);
     private readonly base = `${API_URL}/admin/lotes`;
@@ -28,7 +31,9 @@ export class ProductBatchService {
     }
 
     getByProduct(productId: number): Observable<ProductBatch[]> {
-        return this.http.get<ProductBatch[]>(`${this.base}/producto/${productId}`);
+        return this.http.get<ProductBatch[]>(
+            `${this.base}/producto/${productId}`,
+        );
     }
 
     getById(id: number): Observable<ProductBatch> {
@@ -40,7 +45,10 @@ export class ProductBatchService {
     }
 
     update(id: number, request: ProductBatchRequest): Observable<ProductBatch> {
-        return this.http.put<ProductBatch>(`${this.base}/${id}/update`, request);
+        return this.http.put<ProductBatch>(
+            `${this.base}/${id}/update`,
+            request,
+        );
     }
 
     delete(id: number): Observable<void> {

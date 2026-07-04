@@ -1,8 +1,8 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { ApiErrorResponse } from '../models/api-error.model';
-import { AuthService } from '../services/auth.service';
+import { HttpErrorResponse } from "@angular/common/http";
+import { ApiErrorResponse } from "../models/api-error.model";
+import { AuthService } from "../services/auth.service";
 
-const TRANSIENT_AUTH_MESSAGE = 'servicio de autenticación no disponible';
+const TRANSIENT_AUTH_MESSAGE = "servicio de autenticación no disponible";
 
 export function isTransientAuthError(error: unknown): boolean {
     if (!(error instanceof HttpErrorResponse) || error.status !== 503) {
@@ -12,7 +12,10 @@ export function isTransientAuthError(error: unknown): boolean {
 }
 
 /** Suppress false-positive auth toasts during bootstrap or transient backend auth failures. */
-export function shouldSuppressErrorToast(error: unknown, authService: AuthService): boolean {
+export function shouldSuppressErrorToast(
+    error: unknown,
+    authService: AuthService,
+): boolean {
     if (!authService.isAuthReady()) {
         return true;
     }
@@ -32,11 +35,11 @@ export function shouldSuppressErrorToast(error: unknown, authService: AuthServic
 }
 
 function containsAuthUnavailableMessage(body: unknown): boolean {
-    if (typeof body === 'string') {
+    if (typeof body === "string") {
         return body.toLowerCase().includes(TRANSIENT_AUTH_MESSAGE);
     }
-    if (body && typeof body === 'object' && 'message' in body) {
-        const message = String((body as ApiErrorResponse).message ?? '');
+    if (body && typeof body === "object" && "message" in body) {
+        const message = String((body as ApiErrorResponse).message ?? "");
         return message.toLowerCase().includes(TRANSIENT_AUTH_MESSAGE);
     }
     return false;
@@ -48,15 +51,15 @@ export function extractErrorMessage(error: unknown, fallback: string): string {
     }
     if (error instanceof HttpErrorResponse) {
         const body = error.error as ApiErrorResponse | string;
-        if (typeof body === 'string' && body.length > 0) {
+        if (typeof body === "string" && body.length > 0) {
             return body;
         }
-        if (body && typeof body === 'object') {
+        if (body && typeof body === "object") {
             if (body.message) {
                 return body.message;
             }
             if (body.errors) {
-                return Object.values(body.errors).join('. ');
+                return Object.values(body.errors).join(". ");
             }
         }
     }

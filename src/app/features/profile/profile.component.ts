@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
-import { AuthService } from '../../core/services/auth.service';
+import { Component, inject } from "@angular/core";
+import { PageHeaderComponent } from "../../shared/components/page-header/page-header.component";
+import { AuthService } from "../../core/services/auth.service";
 
 @Component({
-    selector: 'app-profile',
+    selector: "app-profile",
     standalone: true,
     imports: [PageHeaderComponent],
     template: `

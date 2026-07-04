@@ -1,7 +1,11 @@
 :root {
     --color-bg-start: #f8fafc;
     --color-bg-end: #f1f5f9;
-    --color-bg-gradient: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
+    --color-bg-gradient: linear-gradient(
+        135deg,
+        var(--color-bg-start) 0%,
+        var(--color-bg-end) 100%
+    );
     --color-surface: #ffffff;
     --color-surface-hover: #ffffff;
     --color-input-bg: #ffffff;
@@ -21,7 +25,9 @@
     --color-info: #4f46e5;
     --color-border: #e2e8f0;
     --color-border-input: #cbd5e1;
-    --shadow-card: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 10px 15px -3px rgba(15, 23, 42, 0.06);
+    --shadow-card:
+        0 4px 6px -1px rgba(15, 23, 42, 0.08),
+        0 10px 15px -3px rgba(15, 23, 42, 0.06);
     --shadow-button: 0 4px 14px rgba(79, 70, 229, 0.35);
     --shadow-sidebar: 2px 0 12px rgba(15, 23, 42, 0.06);
     --space-xs: 0.25rem;

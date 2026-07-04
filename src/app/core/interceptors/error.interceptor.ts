@@ -1,8 +1,8 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { HttpInterceptorFn, HttpErrorResponse } from "@angular/common/http";
+import { inject } from "@angular/core";
+import { Router } from "@angular/router";
+import { catchError, throwError } from "rxjs";
+import { AuthService } from "../services/auth.service";
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const authService = inject(AuthService);
@@ -10,11 +10,15 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
-            const isAuthLogin = req.url.includes('/auth/login');
+            const isAuthLogin = req.url.includes("/auth/login");
 
-            if (error.status === 401 && !isAuthLogin && authService.isAuthReady()) {
+            if (
+                error.status === 401 &&
+                !isAuthLogin &&
+                authService.isAuthReady()
+            ) {
                 authService.logout();
-                router.navigate(['/login']);
+                router.navigate(["/login"]);
             }
 
             if (
@@ -24,7 +28,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 authService.getToken()
             ) {
                 authService.logout();
-                router.navigate(['/login']);
+                router.navigate(["/login"]);
             }
 
             return throwError(() => error);

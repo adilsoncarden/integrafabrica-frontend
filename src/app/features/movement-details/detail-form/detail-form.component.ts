@@ -1,27 +1,36 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { MovementDetailService } from '../../../core/services/movement-detail.service';
-import { MovementService } from '../../../core/services/movement.service';
-import { ProductService } from '../../../core/services/product.service';
-import { ProductBatchService } from '../../../core/services/product-batch.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Movement } from '../../../core/models/movement.model';
-import { Product } from '../../../core/models/product.model';
-import { ProductBatch } from '../../../core/models/product-batch.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
+import { forkJoin } from "rxjs";
+import { MovementDetailService } from "../../../core/services/movement-detail.service";
+import { MovementService } from "../../../core/services/movement.service";
+import { ProductService } from "../../../core/services/product.service";
+import { ProductBatchService } from "../../../core/services/product-batch.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Movement } from "../../../core/models/movement.model";
+import { Product } from "../../../core/models/product.model";
+import { ProductBatch } from "../../../core/models/product-batch.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { extractErrorMessage } from "../../../core/utils/error.util";
 
 @Component({
-    selector: 'app-detail-form',
+    selector: "app-detail-form",
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink, PageHeaderComponent, LoadingSpinnerComponent],
+    imports: [
+        ReactiveFormsModule,
+        RouterLink,
+        PageHeaderComponent,
+        LoadingSpinnerComponent,
+    ],
     template: `
         <app-page-header
             [title]="isEdit ? 'Editar detalle' : 'Nuevo detalle'"
-            [subtitle]="isEdit ? 'Modifica la línea de movimiento' : 'Agrega una línea al movimiento'"
+            [subtitle]="
+                isEdit
+                    ? 'Modifica la línea de movimiento'
+                    : 'Agrega una línea al movimiento'
+            "
         />
 
         @if (loading()) {
@@ -32,18 +41,27 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                     <div class="form-group">
                         <label for="movement_id">Movimiento *</label>
                         <select id="movement_id" formControlName="movement_id">
-                            <option [ngValue]="null" disabled>Seleccionar...</option>
+                            <option [ngValue]="null" disabled>
+                                Seleccionar...
+                            </option>
                             @for (m of movements(); track m.id) {
-                                <option [ngValue]="m.id">#{{ m.id }} — {{ m.movement_type }} — {{ m.reason }}</option>
+                                <option [ngValue]="m.id">
+                                    #{{ m.id }} — {{ m.movement_type }} —
+                                    {{ m.reason }}
+                                </option>
                             }
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="product_id">Producto *</label>
                         <select id="product_id" formControlName="product_id">
-                            <option [ngValue]="null" disabled>Seleccionar...</option>
+                            <option [ngValue]="null" disabled>
+                                Seleccionar...
+                            </option>
                             @for (p of products(); track p.id) {
-                                <option [ngValue]="p.id">{{ p.name }} ({{ p.sku }})</option>
+                                <option [ngValue]="p.id">
+                                    {{ p.name }} ({{ p.sku }})
+                                </option>
                             }
                         </select>
                     </div>
@@ -52,25 +70,52 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                         <select id="batch_id" formControlName="batch_id">
                             <option [ngValue]="null">Sin lote</option>
                             @for (b of batches(); track b.id) {
-                                <option [ngValue]="b.id">{{ b.batch_code }}</option>
+                                <option [ngValue]="b.id">
+                                    {{ b.batch_code }}
+                                </option>
                             }
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="quantity">Cantidad *</label>
-                        <input id="quantity" type="number" formControlName="quantity" min="1" />
+                        <input
+                            id="quantity"
+                            type="number"
+                            formControlName="quantity"
+                            min="1"
+                        />
                     </div>
                 </div>
                 <div class="form-actions">
-                    <a routerLink="/admin/detalles-movimiento" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn" [disabled]="form.invalid || saving()">
-                        {{ saving() ? 'Guardando...' : isEdit ? 'Actualizar' : 'Crear' }}
+                    <a
+                        routerLink="/admin/detalles-movimiento"
+                        class="btn btn-secondary"
+                        >Cancelar</a
+                    >
+                    <button
+                        type="submit"
+                        class="btn"
+                        [disabled]="form.invalid || saving()"
+                    >
+                        {{
+                            saving()
+                                ? "Guardando..."
+                                : isEdit
+                                  ? "Actualizar"
+                                  : "Crear"
+                        }}
                     </button>
                 </div>
             </form>
         }
     `,
-    styles: `.form-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }`,
+    styles: `
+        .form-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+    `,
 })
 export class DetailFormComponent implements OnInit {
     private readonly fb = inject(FormBuilder);
@@ -98,13 +143,14 @@ export class DetailFormComponent implements OnInit {
     });
 
     ngOnInit(): void {
-        const idParam = this.route.snapshot.paramMap.get('id');
+        const idParam = this.route.snapshot.paramMap.get("id");
         if (idParam) {
             this.isEdit = true;
             this.editId = Number(idParam);
         }
 
-        const movementIdQuery = this.route.snapshot.queryParamMap.get('movement_id');
+        const movementIdQuery =
+            this.route.snapshot.queryParamMap.get("movement_id");
         if (movementIdQuery && !this.isEdit) {
             this.form.patchValue({ movement_id: Number(movementIdQuery) });
         }
@@ -124,7 +170,9 @@ export class DetailFormComponent implements OnInit {
         const loads = [
             this.movementService.getAll(),
             this.productService.getAll(),
-            ...(this.isEdit && this.editId ? [this.detailService.getById(this.editId)] : []),
+            ...(this.isEdit && this.editId
+                ? [this.detailService.getById(this.editId)]
+                : []),
         ];
 
         forkJoin(loads).subscribe({
@@ -132,7 +180,8 @@ export class DetailFormComponent implements OnInit {
                 this.movements.set(results[0] as Movement[]);
                 this.products.set(results[1] as Product[]);
                 if (this.isEdit && results[2]) {
-                    const d = results[2] as import('../../../core/models/movement-detail.model').MovementDetail;
+                    const d =
+                        results[2] as import("../../../core/models/movement-detail.model").MovementDetail;
                     this.form.patchValue({
                         movement_id: d.movement_id,
                         product_id: d.product_id,
@@ -148,7 +197,9 @@ export class DetailFormComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al cargar datos.'));
+                this.toast.error(
+                    extractErrorMessage(err, "Error al cargar datos."),
+                );
                 this.loading.set(false);
             },
         });
@@ -173,11 +224,13 @@ export class DetailFormComponent implements OnInit {
 
         op.subscribe({
             next: () => {
-                this.toast.success(this.isEdit ? 'Línea actualizada.' : 'Línea creada.');
-                this.router.navigate(['/admin/detalles-movimiento']);
+                this.toast.success(
+                    this.isEdit ? "Línea actualizada." : "Línea creada.",
+                );
+                this.router.navigate(["/admin/detalles-movimiento"]);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, "Error al guardar."));
                 this.saving.set(false);
             },
         });

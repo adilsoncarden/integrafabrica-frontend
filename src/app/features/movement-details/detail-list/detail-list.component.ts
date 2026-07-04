@@ -1,19 +1,22 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
-import { MovementDetailService } from '../../../core/services/movement-detail.service';
-import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { MovementDetail } from '../../../core/models/movement-detail.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
-import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
-import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
+import { Component, inject, signal } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { AuthService } from "../../../core/services/auth.service";
+import { MovementDetailService } from "../../../core/services/movement-detail.service";
+import { ConfirmDialogService } from "../../../core/services/confirm-dialog.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { MovementDetail } from "../../../core/models/movement-detail.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { EmptyStateComponent } from "../../../shared/components/empty-state/empty-state.component";
+import { PaginationNavComponent } from "../../../shared/components/pagination-nav/pagination-nav.component";
+import {
+    extractErrorMessage,
+    shouldSuppressErrorToast,
+} from "../../../core/utils/error.util";
+import { setupAuthGuardedInitialLoad } from "../../../core/utils/auth-ready.util";
 
 @Component({
-    selector: 'app-detail-list',
+    selector: "app-detail-list",
     standalone: true,
     imports: [
         RouterLink,
@@ -23,15 +26,26 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
         PaginationNavComponent,
     ],
     template: `
-        <app-page-header title="Detalles de movimiento" subtitle="Líneas de productos en movimientos">
-            <a routerLink="/admin/detalles-movimiento/nuevo" class="btn">+ Nuevo</a>
+        <app-page-header
+            title="Detalles de movimiento"
+            subtitle="Líneas de productos en movimientos"
+        >
+            <a routerLink="/admin/detalles-movimiento/nuevo" class="btn"
+                >+ Nuevo</a
+            >
         </app-page-header>
 
         @if (loading()) {
             <app-loading-spinner />
         } @else if (totalElements() === 0) {
-            <app-empty-state icon="📝" title="Sin detalles" message="No hay líneas de movimiento registradas.">
-                <a routerLink="/admin/detalles-movimiento/nuevo" class="btn">+ Nuevo</a>
+            <app-empty-state
+                icon="📝"
+                title="Sin detalles"
+                message="No hay líneas de movimiento registradas."
+            >
+                <a routerLink="/admin/detalles-movimiento/nuevo" class="btn"
+                    >+ Nuevo</a
+                >
             </app-empty-state>
         } @else {
             <div class="glass-card">
@@ -51,15 +65,42 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
                             <tr>
                                 <td>{{ item.id }}</td>
                                 <td>
-                                    <a [routerLink]="['/admin/movimientos', item.movement_id]">{{ item.movement_id }}</a>
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/movimientos',
+                                            item.movement_id,
+                                        ]"
+                                        >{{ item.movement_id }}</a
+                                    >
                                 </td>
                                 <td>{{ item.product_name }}</td>
-                                <td>{{ item.batch_code || '—' }}</td>
+                                <td>{{ item.batch_code || "—" }}</td>
                                 <td>{{ item.quantity }}</td>
                                 <td class="actions">
-                                    <a [routerLink]="['/admin/detalles-movimiento', item.id]" class="btn-sm btn-secondary">Ver</a>
-                                    <a [routerLink]="['/admin/detalles-movimiento', item.id, 'editar']" class="btn-sm btn-secondary">Editar</a>
-                                    <button type="button" class="btn-sm btn-danger" (click)="onDelete(item)">Eliminar</button>
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/detalles-movimiento',
+                                            item.id,
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Ver</a
+                                    >
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/detalles-movimiento',
+                                            item.id,
+                                            'editar',
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Editar</a
+                                    >
+                                    <button
+                                        type="button"
+                                        class="btn-sm btn-danger"
+                                        (click)="onDelete(item)"
+                                    >
+                                        Eliminar
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -74,7 +115,13 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
             </div>
         }
     `,
-    styles: `.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }`,
+    styles: `
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+    `,
 })
 export class DetailListComponent {
     private readonly authService = inject(AuthService);
@@ -94,19 +141,26 @@ export class DetailListComponent {
 
     load(): void {
         this.loading.set(true);
-        this.detailService.getPage(this.currentPage(), this.pageSize()).subscribe({
-            next: (page) => {
-                this.items.set(page.content);
-                this.totalElements.set(page.totalElements);
-                this.loading.set(false);
-            },
-            error: (err) => {
-                if (!shouldSuppressErrorToast(err, this.authService)) {
-                    this.toast.error(extractErrorMessage(err, 'Error al cargar detalles.'));
-                }
-                this.loading.set(false);
-            },
-        });
+        this.detailService
+            .getPage(this.currentPage(), this.pageSize())
+            .subscribe({
+                next: (page) => {
+                    this.items.set(page.content);
+                    this.totalElements.set(page.totalElements);
+                    this.loading.set(false);
+                },
+                error: (err) => {
+                    if (!shouldSuppressErrorToast(err, this.authService)) {
+                        this.toast.error(
+                            extractErrorMessage(
+                                err,
+                                "Error al cargar detalles.",
+                            ),
+                        );
+                    }
+                    this.loading.set(false);
+                },
+            });
     }
 
     changePage(page: number): void {
@@ -116,10 +170,10 @@ export class DetailListComponent {
 
     async onDelete(item: MovementDetail): Promise<void> {
         const confirmed = await this.confirmDialog.confirm({
-            title: 'Eliminar detalle',
+            title: "Eliminar detalle",
             message: `¿Eliminar línea #${item.id}?`,
             danger: true,
-            confirmLabel: 'Eliminar',
+            confirmLabel: "Eliminar",
         });
         if (!confirmed) return;
 
@@ -128,7 +182,10 @@ export class DetailListComponent {
                 this.toast.success(`Línea #${item.id} eliminada.`);
                 this.load();
             },
-            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
+            error: (err) =>
+                this.toast.error(
+                    extractErrorMessage(err, "Error al eliminar."),
+                ),
         });
     }
 }

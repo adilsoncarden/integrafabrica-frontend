@@ -1,7 +1,7 @@
-import { Component, input } from '@angular/core';
+import { Component, input } from "@angular/core";
 
 @Component({
-    selector: 'app-page-header',
+    selector: "app-page-header",
     standalone: true,
     template: `
         <div class="page-header">
@@ -34,5 +34,5 @@ import { Component, input } from '@angular/core';
 })
 export class PageHeaderComponent {
     title = input.required<string>();
-    subtitle = input<string>('');
+    subtitle = input<string>("");
 }

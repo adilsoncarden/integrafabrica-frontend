@@ -1,20 +1,23 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { ProductBatchService } from '../../../core/services/product-batch.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { ProductBatch } from '../../../core/models/product-batch.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
-import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
-import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
+import { Component, inject, signal } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { DatePipe } from "@angular/common";
+import { ProductBatchService } from "../../../core/services/product-batch.service";
+import { AuthService } from "../../../core/services/auth.service";
+import { ConfirmDialogService } from "../../../core/services/confirm-dialog.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { ProductBatch } from "../../../core/models/product-batch.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { EmptyStateComponent } from "../../../shared/components/empty-state/empty-state.component";
+import { PaginationNavComponent } from "../../../shared/components/pagination-nav/pagination-nav.component";
+import {
+    extractErrorMessage,
+    shouldSuppressErrorToast,
+} from "../../../core/utils/error.util";
+import { setupAuthGuardedInitialLoad } from "../../../core/utils/auth-ready.util";
 
 @Component({
-    selector: 'app-batch-list',
+    selector: "app-batch-list",
     standalone: true,
     imports: [
         RouterLink,
@@ -32,7 +35,11 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
         @if (loading()) {
             <app-loading-spinner />
         } @else if (totalElements() === 0) {
-            <app-empty-state icon="🧪" title="Sin lotes" message="Registra tu primer lote.">
+            <app-empty-state
+                icon="🧪"
+                title="Sin lotes"
+                message="Registra tu primer lote."
+            >
                 <a routerLink="/admin/lotes/nuevo" class="btn">+ Nuevo</a>
             </app-empty-state>
         } @else {
@@ -55,13 +62,36 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
                                 <td>{{ item.id }}</td>
                                 <td>{{ item.batch_code }}</td>
                                 <td>{{ item.product.name }}</td>
-                                <td>{{ item.expiration_date | date: 'dd/MM/yyyy' }}</td>
+                                <td>
+                                    {{
+                                        item.expiration_date
+                                            | date: "dd/MM/yyyy"
+                                    }}
+                                </td>
                                 <td>{{ item.initial_quantity }}</td>
                                 <td>{{ item.current_quantity }}</td>
                                 <td class="actions">
-                                    <a [routerLink]="['/admin/lotes', item.id]" class="btn-sm btn-secondary">Ver</a>
-                                    <a [routerLink]="['/admin/lotes', item.id, 'editar']" class="btn-sm btn-secondary">Editar</a>
-                                    <button type="button" class="btn-sm btn-danger" (click)="onDelete(item)">Eliminar</button>
+                                    <a
+                                        [routerLink]="['/admin/lotes', item.id]"
+                                        class="btn-sm btn-secondary"
+                                        >Ver</a
+                                    >
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/lotes',
+                                            item.id,
+                                            'editar',
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Editar</a
+                                    >
+                                    <button
+                                        type="button"
+                                        class="btn-sm btn-danger"
+                                        (click)="onDelete(item)"
+                                    >
+                                        Eliminar
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -76,7 +106,13 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
             </div>
         }
     `,
-    styles: `.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }`,
+    styles: `
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+    `,
 })
 export class BatchListComponent {
     private readonly service = inject(ProductBatchService);
@@ -104,7 +140,9 @@ export class BatchListComponent {
             },
             error: (err) => {
                 if (!shouldSuppressErrorToast(err, this.authService)) {
-                    this.toast.error(extractErrorMessage(err, 'Error al cargar lotes.'));
+                    this.toast.error(
+                        extractErrorMessage(err, "Error al cargar lotes."),
+                    );
                 }
                 this.loading.set(false);
             },
@@ -118,10 +156,10 @@ export class BatchListComponent {
 
     async onDelete(item: ProductBatch): Promise<void> {
         const confirmed = await this.confirmDialog.confirm({
-            title: 'Eliminar lote',
+            title: "Eliminar lote",
             message: `¿Eliminar lote "${item.batch_code}"?`,
             danger: true,
-            confirmLabel: 'Eliminar',
+            confirmLabel: "Eliminar",
         });
         if (!confirmed) return;
 
@@ -130,7 +168,10 @@ export class BatchListComponent {
                 this.toast.success(`Lote "${item.batch_code}" eliminado.`);
                 this.load();
             },
-            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
+            error: (err) =>
+                this.toast.error(
+                    extractErrorMessage(err, "Error al eliminar."),
+                ),
         });
     }
 }

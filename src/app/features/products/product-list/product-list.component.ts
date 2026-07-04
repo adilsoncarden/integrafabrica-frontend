@@ -1,19 +1,22 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { ProductService } from '../../../core/services/product.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Product } from '../../../core/models/product.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
-import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
-import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
+import { Component, inject, signal } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { ProductService } from "../../../core/services/product.service";
+import { AuthService } from "../../../core/services/auth.service";
+import { ConfirmDialogService } from "../../../core/services/confirm-dialog.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Product } from "../../../core/models/product.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { EmptyStateComponent } from "../../../shared/components/empty-state/empty-state.component";
+import { PaginationNavComponent } from "../../../shared/components/pagination-nav/pagination-nav.component";
+import {
+    extractErrorMessage,
+    shouldSuppressErrorToast,
+} from "../../../core/utils/error.util";
+import { setupAuthGuardedInitialLoad } from "../../../core/utils/auth-ready.util";
 
 @Component({
-    selector: 'app-product-list',
+    selector: "app-product-list",
     standalone: true,
     imports: [
         RouterLink,
@@ -30,7 +33,11 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
         @if (loading()) {
             <app-loading-spinner />
         } @else if (totalElements() === 0) {
-            <app-empty-state icon="📦" title="Sin productos" message="Registra tu primer producto.">
+            <app-empty-state
+                icon="📦"
+                title="Sin productos"
+                message="Registra tu primer producto."
+            >
                 <a routerLink="/admin/productos/nuevo" class="btn">+ Nuevo</a>
             </app-empty-state>
         } @else {
@@ -55,7 +62,11 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
                                 <td>{{ item.sku }}</td>
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.category.name }}</td>
-                                <td>{{ item.location.aisle }}-{{ item.location.rack }}-{{ item.location.level }}</td>
+                                <td>
+                                    {{ item.location.aisle }}-{{
+                                        item.location.rack
+                                    }}-{{ item.location.level }}
+                                </td>
                                 <td>
                                     {{ item.stock }}
                                     @if (item.stock < item.minStock) {
@@ -64,9 +75,30 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
                                 </td>
                                 <td>{{ item.minStock }}</td>
                                 <td class="actions">
-                                    <a [routerLink]="['/admin/productos', item.id]" class="btn-sm btn-secondary">Ver</a>
-                                    <a [routerLink]="['/admin/productos', item.id, 'editar']" class="btn-sm btn-secondary">Editar</a>
-                                    <button type="button" class="btn-sm btn-danger" (click)="onDelete(item)">Eliminar</button>
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/productos',
+                                            item.id,
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Ver</a
+                                    >
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/productos',
+                                            item.id,
+                                            'editar',
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Editar</a
+                                    >
+                                    <button
+                                        type="button"
+                                        class="btn-sm btn-danger"
+                                        (click)="onDelete(item)"
+                                    >
+                                        Eliminar
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -81,7 +113,13 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
             </div>
         }
     `,
-    styles: `.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }`,
+    styles: `
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+    `,
 })
 export class ProductListComponent {
     private readonly service = inject(ProductService);
@@ -109,7 +147,9 @@ export class ProductListComponent {
             },
             error: (err) => {
                 if (!shouldSuppressErrorToast(err, this.authService)) {
-                    this.toast.error(extractErrorMessage(err, 'Error al cargar productos.'));
+                    this.toast.error(
+                        extractErrorMessage(err, "Error al cargar productos."),
+                    );
                 }
                 this.loading.set(false);
             },
@@ -123,10 +163,10 @@ export class ProductListComponent {
 
     async onDelete(item: Product): Promise<void> {
         const confirmed = await this.confirmDialog.confirm({
-            title: 'Eliminar producto',
+            title: "Eliminar producto",
             message: `¿Eliminar "${item.name}"?`,
             danger: true,
-            confirmLabel: 'Eliminar',
+            confirmLabel: "Eliminar",
         });
         if (!confirmed) return;
 
@@ -135,7 +175,10 @@ export class ProductListComponent {
                 this.toast.success(`Producto "${item.name}" eliminado.`);
                 this.load();
             },
-            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
+            error: (err) =>
+                this.toast.error(
+                    extractErrorMessage(err, "Error al eliminar."),
+                ),
         });
     }
 }

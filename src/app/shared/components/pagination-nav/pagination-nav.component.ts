@@ -1,7 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output } from "@angular/core";
 
 @Component({
-    selector: 'app-pagination-nav',
+    selector: "app-pagination-nav",
     standalone: true,
     template: `
         <nav
@@ -97,7 +97,7 @@ export class PaginationNavComponent {
     rangeLabel(): string {
         const total = this.totalElements();
         if (total === 0) {
-            return 'Sin registros';
+            return "Sin registros";
         }
         const page = this.currentPage();
         const size = this.pageSize();
@@ -107,11 +107,13 @@ export class PaginationNavComponent {
     }
 
     isLastPage(): boolean {
-        return (this.currentPage() + 1) * this.pageSize() >= this.totalElements();
+        return (
+            (this.currentPage() + 1) * this.pageSize() >= this.totalElements()
+        );
     }
 
     onPageChange(page: number): void {
-        if (page < 0 || this.isLastPage() && page > this.currentPage()) {
+        if (page < 0 || (this.isLastPage() && page > this.currentPage())) {
             return;
         }
         this.pageChange.emit(page);

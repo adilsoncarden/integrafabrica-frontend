@@ -1,7 +1,7 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { catchError, switchMap, throwError, timer } from 'rxjs';
+import { HttpErrorResponse, HttpInterceptorFn } from "@angular/common/http";
+import { catchError, switchMap, throwError, timer } from "rxjs";
 const RETRY_DELAY_MS = 500;
-const TOKEN_STORAGE_KEY = 'token';
+const TOKEN_STORAGE_KEY = "token";
 
 function readTokenSync(): string | null {
     return localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -17,7 +17,7 @@ function isRetryableAuthFailure(error: HttpErrorResponse): boolean {
  * Does not retry 503 — retries would double JDBC load during pool exhaustion.
  */
 export const authRetryInterceptor: HttpInterceptorFn = (req, next) => {
-    const canRetry = req.method === 'GET' && !req.url.includes('/auth/login');
+    const canRetry = req.method === "GET" && !req.url.includes("/auth/login");
 
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {

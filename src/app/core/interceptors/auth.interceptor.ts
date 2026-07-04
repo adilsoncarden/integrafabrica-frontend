@@ -1,1 +1,1 @@
-export { jwtInterceptor as authInterceptor } from './jwt.interceptor';
+export { jwtInterceptor as authInterceptor } from "./jwt.interceptor";

@@ -30,7 +30,11 @@
     margin-bottom: 2.5rem;
 
     .brand-icon {
-        background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+        background: linear-gradient(
+            135deg,
+            var(--color-primary),
+            var(--color-accent)
+        );
         width: 64px;
         height: 64px;
         margin: 0 auto 1rem;
@@ -142,7 +146,9 @@
     color: var(--color-text-secondary);
     cursor: pointer;
     border-radius: var(--radius-sm);
-    transition: color 0.2s ease, background 0.2s ease;
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
 
     .bi {
         font-size: 1.125rem;

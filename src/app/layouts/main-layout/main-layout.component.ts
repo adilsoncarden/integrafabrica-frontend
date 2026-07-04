@@ -1,6 +1,11 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { Component, computed, inject, signal } from "@angular/core";
+import {
+    Router,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+} from "@angular/router";
+import { AuthService } from "../../core/services/auth.service";
 
 interface NavItem {
     label: string;
@@ -9,11 +14,11 @@ interface NavItem {
 }
 
 @Component({
-    selector: 'app-main-layout',
+    selector: "app-main-layout",
     standalone: true,
     imports: [RouterOutlet, RouterLink, RouterLinkActive],
-    templateUrl: './main-layout.component.html',
-    styleUrl: './main-layout.component.scss',
+    templateUrl: "./main-layout.component.html",
+    styleUrl: "./main-layout.component.scss",
 })
 export class MainLayoutComponent {
     private readonly authService = inject(AuthService);
@@ -23,22 +28,30 @@ export class MainLayoutComponent {
     userMenuOpen = signal(false);
 
     readonly navItems: NavItem[] = [
-        { label: 'Dashboard', icon: 'speedometer2', route: '/admin/dashboard' },
-        { label: 'Categorías', icon: 'tags', route: '/admin/categorias' },
-        { label: 'Ubicaciones', icon: 'geo-alt', route: '/admin/ubicaciones' },
-        { label: 'Proveedores', icon: 'truck', route: '/admin/proveedores' },
-        { label: 'Productos', icon: 'box-seam', route: '/admin/productos' },
-        { label: 'Lotes', icon: 'boxes', route: '/admin/lotes' },
-        { label: 'Movimientos', icon: 'arrow-left-right', route: '/admin/movimientos' },
-        { label: 'Detalles Mov.', icon: 'receipt', route: '/admin/detalles-movimiento' },
+        { label: "Dashboard", icon: "speedometer2", route: "/admin/dashboard" },
+        { label: "Categorías", icon: "tags", route: "/admin/categorias" },
+        { label: "Ubicaciones", icon: "geo-alt", route: "/admin/ubicaciones" },
+        { label: "Proveedores", icon: "truck", route: "/admin/proveedores" },
+        { label: "Productos", icon: "box-seam", route: "/admin/productos" },
+        { label: "Lotes", icon: "boxes", route: "/admin/lotes" },
+        {
+            label: "Movimientos",
+            icon: "arrow-left-right",
+            route: "/admin/movimientos",
+        },
+        {
+            label: "Detalles Mov.",
+            icon: "receipt",
+            route: "/admin/detalles-movimiento",
+        },
     ];
 
     currentUser = this.authService.currentUser;
 
     userInitials = computed(() => {
-        const username = this.currentUser()?.username ?? '';
+        const username = this.currentUser()?.username ?? "";
         if (!username) {
-            return '?';
+            return "?";
         }
         const parts = username.split(/[._@-]/).filter(Boolean);
         if (parts.length >= 2) {
@@ -48,11 +61,11 @@ export class MainLayoutComponent {
     });
 
     userRoleLabel = computed(() => {
-        const role = this.currentUser()?.role ?? '';
+        const role = this.currentUser()?.role ?? "";
         if (!role) {
-            return 'Usuario';
+            return "Usuario";
         }
-        return role.replace(/^ROLE_/, '');
+        return role.replace(/^ROLE_/, "");
     });
 
     toggleSidebar(): void {
@@ -65,6 +78,6 @@ export class MainLayoutComponent {
 
     logout(): void {
         this.authService.logout();
-        this.router.navigate(['/login']);
+        this.router.navigate(["/login"]);
     }
 }

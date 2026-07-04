@@ -1,12 +1,12 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { switchMap, take } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { HttpInterceptorFn } from "@angular/common/http";
+import { inject } from "@angular/core";
+import { switchMap, take } from "rxjs";
+import { AuthService } from "../services/auth.service";
 
-const TOKEN_STORAGE_KEY = 'token';
+const TOKEN_STORAGE_KEY = "token";
 
 function isPublicRequest(url: string): boolean {
-    return url.includes('/auth/login');
+    return url.includes("/auth/login");
 }
 
 /** Reads JWT synchronously from storage — avoids race with AuthService signal hydration. */
@@ -39,5 +39,8 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         return dispatch();
     }
 
-    return authService.whenReady().pipe(take(1), switchMap(() => dispatch()));
+    return authService.whenReady().pipe(
+        take(1),
+        switchMap(() => dispatch()),
+    );
 };

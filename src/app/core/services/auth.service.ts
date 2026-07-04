@@ -1,15 +1,15 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { Observable, filter, map, of, take, tap } from 'rxjs';
-import { API_URL } from '../config/api.config';
-import { AuthResponse, LoginRequest } from '../models/auth.model';
+import { Injectable, inject, signal } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { toObservable } from "@angular/core/rxjs-interop";
+import { Observable, filter, map, of, take, tap } from "rxjs";
+import { API_URL } from "../config/api.config";
+import { AuthResponse, LoginRequest } from "../models/auth.model";
 
-const TOKEN_STORAGE_KEY = 'token';
-const USER_STORAGE_KEY = 'user';
+const TOKEN_STORAGE_KEY = "token";
+const USER_STORAGE_KEY = "user";
 
 @Injectable({
-    providedIn: 'root',
+    providedIn: "root",
 })
 export class AuthService {
     private readonly http = inject(HttpClient);
@@ -34,7 +34,11 @@ export class AuthService {
     }
 
     isAuthenticated(): boolean {
-        return this.isAuthReady() && !!this.readTokenFromStorage() && !!this.currentUser();
+        return (
+            this.isAuthReady() &&
+            !!this.readTokenFromStorage() &&
+            !!this.currentUser()
+        );
     }
 
     /** Emits once when local session restoration has completed. */
@@ -50,14 +54,19 @@ export class AuthService {
     }
 
     login(credentials: LoginRequest): Observable<AuthResponse> {
-        return this.http.post<AuthResponse>(`${this.API_AUTH}/login`, credentials).pipe(
-            tap((response) => {
-                localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
-                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(response));
-                this.currentUser.set(response);
-                this.isAuthReady.set(true);
-            }),
-        );
+        return this.http
+            .post<AuthResponse>(`${this.API_AUTH}/login`, credentials)
+            .pipe(
+                tap((response) => {
+                    localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
+                    localStorage.setItem(
+                        USER_STORAGE_KEY,
+                        JSON.stringify(response),
+                    );
+                    this.currentUser.set(response);
+                    this.isAuthReady.set(true);
+                }),
+            );
     }
 
     logout(): void {

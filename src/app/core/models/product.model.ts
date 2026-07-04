@@ -1,5 +1,5 @@
-import { Category } from './category.model';
-import { Location } from './location.model';
+import { Category } from "./category.model";
+import { Location } from "./location.model";
 
 export interface Product {
     id: number;

@@ -47,7 +47,9 @@
                             <span class="profile-name">{{
                                 currentUser()?.username
                             }}</span>
-                            <span class="profile-meta">{{ userRoleLabel() }}</span>
+                            <span class="profile-meta">{{
+                                userRoleLabel()
+                            }}</span>
                         </span>
                     }
                 </a>
@@ -70,7 +72,11 @@
                 <i class="bi bi-list" aria-hidden="true"></i>
             </button>
             <div class="navbar-user">
-                <button type="button" class="user-btn" (click)="toggleUserMenu()">
+                <button
+                    type="button"
+                    class="user-btn"
+                    (click)="toggleUserMenu()"
+                >
                     <i class="bi bi-person-circle" aria-hidden="true"></i>
                     {{ currentUser()?.username }}
                 </button>
@@ -86,7 +92,10 @@
                                 class="user-dropdown-item"
                                 (click)="userMenuOpen.set(false)"
                             >
-                                <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                                <i
+                                    class="bi bi-person-vcard"
+                                    aria-hidden="true"
+                                ></i>
                                 Perfil
                             </a>
                             <button
@@ -94,7 +103,10 @@
                                 class="user-dropdown-item user-dropdown-item--logout"
                                 (click)="logout()"
                             >
-                                <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                                <i
+                                    class="bi bi-box-arrow-right"
+                                    aria-hidden="true"
+                                ></i>
                                 Cerrar sesión
                             </button>
                         </nav>

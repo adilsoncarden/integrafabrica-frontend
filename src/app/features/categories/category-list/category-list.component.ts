@@ -1,20 +1,23 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { CategoryService } from '../../../core/services/category.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Category } from '../../../core/models/category.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
-import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
-import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
+import { Component, inject, signal } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { DatePipe } from "@angular/common";
+import { CategoryService } from "../../../core/services/category.service";
+import { AuthService } from "../../../core/services/auth.service";
+import { ConfirmDialogService } from "../../../core/services/confirm-dialog.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Category } from "../../../core/models/category.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { EmptyStateComponent } from "../../../shared/components/empty-state/empty-state.component";
+import { PaginationNavComponent } from "../../../shared/components/pagination-nav/pagination-nav.component";
+import {
+    extractErrorMessage,
+    shouldSuppressErrorToast,
+} from "../../../core/utils/error.util";
+import { setupAuthGuardedInitialLoad } from "../../../core/utils/auth-ready.util";
 
 @Component({
-    selector: 'app-category-list',
+    selector: "app-category-list",
     standalone: true,
     imports: [
         RouterLink,
@@ -25,7 +28,10 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
         PaginationNavComponent,
     ],
     template: `
-        <app-page-header title="Categorías" subtitle="Gestión de categorías de productos">
+        <app-page-header
+            title="Categorías"
+            subtitle="Gestión de categorías de productos"
+        >
             <a routerLink="/admin/categorias/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
 
@@ -56,12 +62,35 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
                             <tr>
                                 <td>{{ item.id }}</td>
                                 <td>{{ item.name }}</td>
-                                <td>{{ item.description || '—' }}</td>
-                                <td>{{ item.createdAt | date: 'dd/MM/yyyy' }}</td>
+                                <td>{{ item.description || "—" }}</td>
+                                <td>
+                                    {{ item.createdAt | date: "dd/MM/yyyy" }}
+                                </td>
                                 <td class="actions">
-                                    <a [routerLink]="['/admin/categorias', item.id]" class="btn-sm btn-secondary">Ver</a>
-                                    <a [routerLink]="['/admin/categorias', item.id, 'editar']" class="btn-sm btn-secondary">Editar</a>
-                                    <button type="button" class="btn-sm btn-danger" (click)="onDelete(item)">Eliminar</button>
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/categorias',
+                                            item.id,
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Ver</a
+                                    >
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/categorias',
+                                            item.id,
+                                            'editar',
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Editar</a
+                                    >
+                                    <button
+                                        type="button"
+                                        class="btn-sm btn-danger"
+                                        (click)="onDelete(item)"
+                                    >
+                                        Eliminar
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -110,7 +139,9 @@ export class CategoryListComponent {
             },
             error: (err) => {
                 if (!shouldSuppressErrorToast(err, this.authService)) {
-                    this.toast.error(extractErrorMessage(err, 'Error al cargar categorías.'));
+                    this.toast.error(
+                        extractErrorMessage(err, "Error al cargar categorías."),
+                    );
                 }
                 this.loading.set(false);
             },
@@ -124,10 +155,10 @@ export class CategoryListComponent {
 
     async onDelete(item: Category): Promise<void> {
         const confirmed = await this.confirmDialog.confirm({
-            title: 'Eliminar categoría',
+            title: "Eliminar categoría",
             message: `¿Eliminar la categoría "${item.name}"?`,
             danger: true,
-            confirmLabel: 'Eliminar',
+            confirmLabel: "Eliminar",
         });
         if (!confirmed) return;
 
@@ -136,7 +167,10 @@ export class CategoryListComponent {
                 this.toast.success(`Categoría "${item.name}" eliminada.`);
                 this.load();
             },
-            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
+            error: (err) =>
+                this.toast.error(
+                    extractErrorMessage(err, "Error al eliminar."),
+                ),
         });
     }
 }

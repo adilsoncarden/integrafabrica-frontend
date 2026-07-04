@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 
 @Component({
-    selector: 'app-loading-spinner',
+    selector: "app-loading-spinner",
     standalone: true,
     template: `
         <div class="loading-wrap">

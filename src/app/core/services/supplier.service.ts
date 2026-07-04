@@ -1,13 +1,13 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap } from 'rxjs';
-import { API_URL } from '../config/api.config';
-import { Supplier, SupplierRequest } from '../models/supplier.model';
-import { PageResponse } from '../models/page.model';
+import { Injectable, inject, signal } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable, map, tap } from "rxjs";
+import { API_URL } from "../config/api.config";
+import { Supplier, SupplierRequest } from "../models/supplier.model";
+import { PageResponse } from "../models/page.model";
 
 const UNPAGED_SIZE = 10_000;
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class SupplierService {
     private readonly http = inject(HttpClient);
     private readonly base = `${API_URL}/admin/proveedores`;

@@ -1,22 +1,36 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { DatePipe, DecimalPipe } from '@angular/common';
-import { DashboardService, DashboardData } from '../../core/services/dashboard.service';
-import { AuthService } from '../../core/services/auth.service';
-import { ToastService } from '../../core/services/toast.service';
-import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
-import { extractErrorMessage, shouldSuppressErrorToast } from '../../core/utils/error.util';
-import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
+import { Component, inject, signal } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { DatePipe, DecimalPipe } from "@angular/common";
+import {
+    DashboardService,
+    DashboardData,
+} from "../../core/services/dashboard.service";
+import { AuthService } from "../../core/services/auth.service";
+import { ToastService } from "../../core/services/toast.service";
+import { LoadingSpinnerComponent } from "../../shared/components/loading-spinner/loading-spinner.component";
+import { PageHeaderComponent } from "../../shared/components/page-header/page-header.component";
+import {
+    extractErrorMessage,
+    shouldSuppressErrorToast,
+} from "../../core/utils/error.util";
+import { setupAuthGuardedInitialLoad } from "../../core/utils/auth-ready.util";
 
 @Component({
-    selector: 'app-dashboard',
+    selector: "app-dashboard",
     standalone: true,
-    imports: [RouterLink, DatePipe, DecimalPipe, LoadingSpinnerComponent, PageHeaderComponent],
+    imports: [
+        RouterLink,
+        DatePipe,
+        DecimalPipe,
+        LoadingSpinnerComponent,
+        PageHeaderComponent,
+    ],
     template: `
         <app-page-header
             title="Dashboard"
-            [subtitle]="'Bienvenido, ' + (authService.currentUser()?.username ?? '')"
+            [subtitle]="
+                'Bienvenido, ' + (authService.currentUser()?.username ?? '')
+            "
         />
 
         @if (loading()) {
@@ -39,7 +53,10 @@ import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
                     <div class="kpi-label">Lotes activos</div>
                 </div>
                 <div class="glass-card kpi-card">
-                    <i class="bi bi-arrow-left-right kpi-icon" aria-hidden="true"></i>
+                    <i
+                        class="bi bi-arrow-left-right kpi-icon"
+                        aria-hidden="true"
+                    ></i>
                     <div class="kpi-value">{{ d.movementCount }}</div>
                     <div class="kpi-label">Movimientos totales</div>
                 </div>
@@ -53,7 +70,10 @@ import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
             <div class="dashboard-grid">
                 <section class="glass-card">
                     <h2>
-                        <i class="bi bi-exclamation-triangle section-icon" aria-hidden="true"></i>
+                        <i
+                            class="bi bi-exclamation-triangle section-icon"
+                            aria-hidden="true"
+                        ></i>
                         Alertas de stock bajo
                     </h2>
                     @if (d.lowStockProducts.length === 0) {
@@ -62,8 +82,15 @@ import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
                         <ul class="alert-list">
                             @for (p of d.lowStockProducts; track p.id) {
                                 <li>
-                                    <a [routerLink]="['/admin/productos', p.id]">{{ p.name }}</a>
-                                    — stock {{ p.stock }} / mín. {{ p.minStock }}
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/productos',
+                                            p.id,
+                                        ]"
+                                        >{{ p.name }}</a
+                                    >
+                                    — stock {{ p.stock }} / mín.
+                                    {{ p.minStock }}
                                     <span class="badge warning">Bajo</span>
                                 </li>
                             }
@@ -73,7 +100,10 @@ import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
 
                 <section class="glass-card">
                     <h2>
-                        <i class="bi bi-hourglass-split section-icon" aria-hidden="true"></i>
+                        <i
+                            class="bi bi-hourglass-split section-icon"
+                            aria-hidden="true"
+                        ></i>
                         Lotes por vencer (30 días)
                     </h2>
                     @if (d.expiringBatches.length === 0) {
@@ -82,9 +112,11 @@ import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
                         <ul class="alert-list">
                             @for (b of d.expiringBatches; track b.id) {
                                 <li>
-                                    <a [routerLink]="['/admin/lotes', b.id]">{{ b.batch_code }}</a>
+                                    <a [routerLink]="['/admin/lotes', b.id]">{{
+                                        b.batch_code
+                                    }}</a>
                                     — {{ b.product.name }} — vence
-                                    {{ b.expiration_date | date: 'dd/MM/yyyy' }}
+                                    {{ b.expiration_date | date: "dd/MM/yyyy" }}
                                 </li>
                             }
                         </ul>
@@ -94,7 +126,10 @@ import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
 
             <section class="glass-card">
                 <h2>
-                    <i class="bi bi-clock-history section-icon" aria-hidden="true"></i>
+                    <i
+                        class="bi bi-clock-history section-icon"
+                        aria-hidden="true"
+                    ></i>
                     Movimientos recientes
                 </h2>
                 @if (d.recentMovements.length === 0) {
@@ -113,15 +148,28 @@ import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
                             @for (m of d.recentMovements; track m.id) {
                                 <tr>
                                     <td>
-                                        <a [routerLink]="['/admin/movimientos', m.id]">{{ m.id }}</a>
+                                        <a
+                                            [routerLink]="[
+                                                '/admin/movimientos',
+                                                m.id,
+                                            ]"
+                                            >{{ m.id }}</a
+                                        >
                                     </td>
                                     <td>
-                                        <span class="badge" [class]="typeBadge(m.movement_type)">{{
-                                            m.movement_type
-                                        }}</span>
+                                        <span
+                                            class="badge"
+                                            [class]="typeBadge(m.movement_type)"
+                                            >{{ m.movement_type }}</span
+                                        >
                                     </td>
                                     <td>{{ m.reason }}</td>
-                                    <td>{{ m.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                                    <td>
+                                        {{
+                                            m.created_at
+                                                | date: "dd/MM/yyyy HH:mm"
+                                        }}
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -132,11 +180,27 @@ import { setupAuthGuardedInitialLoad } from '../../core/utils/auth-ready.util';
             <section class="glass-card quick-links">
                 <h2>Accesos rápidos</h2>
                 <div class="links-row">
-                    <a routerLink="/admin/productos/nuevo" class="btn btn-sm">+ Producto</a>
-                    <a routerLink="/admin/movimientos/nuevo" class="btn btn-sm">+ Movimiento</a>
-                    <a routerLink="/admin/lotes" class="btn btn-secondary btn-sm">Ver Lotes</a>
-                    <a routerLink="/admin/proveedores" class="btn btn-secondary btn-sm">Proveedores</a>
-                    <a routerLink="/admin/categorias" class="btn btn-secondary btn-sm">Categorías</a>
+                    <a routerLink="/admin/productos/nuevo" class="btn btn-sm"
+                        >+ Producto</a
+                    >
+                    <a routerLink="/admin/movimientos/nuevo" class="btn btn-sm"
+                        >+ Movimiento</a
+                    >
+                    <a
+                        routerLink="/admin/lotes"
+                        class="btn btn-secondary btn-sm"
+                        >Ver Lotes</a
+                    >
+                    <a
+                        routerLink="/admin/proveedores"
+                        class="btn btn-secondary btn-sm"
+                        >Proveedores</a
+                    >
+                    <a
+                        routerLink="/admin/categorias"
+                        class="btn btn-secondary btn-sm"
+                        >Categorías</a
+                    >
                 </div>
             </section>
         }
@@ -224,7 +288,12 @@ export class DashboardComponent {
             },
             error: (err) => {
                 if (!shouldSuppressErrorToast(err, this.authService)) {
-                    this.toast.error(extractErrorMessage(err, 'No se pudo cargar el dashboard.'));
+                    this.toast.error(
+                        extractErrorMessage(
+                            err,
+                            "No se pudo cargar el dashboard.",
+                        ),
+                    );
                 }
                 this.loading.set(false);
             },
@@ -233,14 +302,14 @@ export class DashboardComponent {
 
     typeBadge(type: string): string {
         switch (type) {
-            case 'ENTRADA':
-                return 'badge primary';
-            case 'SALIDA':
-                return 'badge success';
-            case 'MERMA':
-                return 'badge danger';
+            case "ENTRADA":
+                return "badge primary";
+            case "SALIDA":
+                return "badge success";
+            case "MERMA":
+                return "badge danger";
             default:
-                return 'badge neutral';
+                return "badge neutral";
         }
     }
 }

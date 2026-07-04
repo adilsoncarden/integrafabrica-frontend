@@ -15,7 +15,7 @@ import { CommonModule } from "@angular/common";
     standalone: true,
     imports: [ReactiveFormsModule, CommonModule],
     templateUrl: "./login.component.html",
-    styleUrls: ['../../../styles/_login.scss']
+    styleUrls: ["../../../styles/_login.scss"],
 })
 export class LoginComponent {
     private readonly fb = inject(FormBuilder);
@@ -40,12 +40,16 @@ export class LoginComponent {
     onSubmit() {
         if (this.loginForm.valid) {
             this.authService.login(this.loginForm.value).subscribe({
-                next: () => this.router.navigate(['/admin/dashboard']),
+                next: () => this.router.navigate(["/admin/dashboard"]),
                 error: (err) => {
                     if (err.status === 401) {
-                        this.toast.error('Credenciales incorrectas. Intente de nuevo.');
+                        this.toast.error(
+                            "Credenciales incorrectas. Intente de nuevo.",
+                        );
                     } else {
-                        this.toast.error('No se pudo iniciar sesión. Verifique el servidor.');
+                        this.toast.error(
+                            "No se pudo iniciar sesión. Verifique el servidor.",
+                        );
                     }
                 },
             });

@@ -1,4 +1,4 @@
-import { Supplier } from './supplier.model';
+import { Supplier } from "./supplier.model";
 
 export interface Movement {
     id: number;
@@ -20,4 +20,4 @@ export interface MovementRequest {
     performed_by?: number | null;
 }
 
-export type MovementType = 'ENTRADA' | 'SALIDA' | 'MERMA';
+export type MovementType = "ENTRADA" | "SALIDA" | "MERMA";

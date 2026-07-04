@@ -1,7 +1,7 @@
-import { Component, input } from '@angular/core';
+import { Component, input } from "@angular/core";
 
 @Component({
-    selector: 'app-empty-state',
+    selector: "app-empty-state",
     standalone: true,
     template: `
         <div class="empty-state">
@@ -32,7 +32,7 @@ import { Component, input } from '@angular/core';
     `,
 })
 export class EmptyStateComponent {
-    icon = input('📭');
-    title = input('Sin registros');
-    message = input('No hay datos para mostrar.');
+    icon = input("📭");
+    title = input("Sin registros");
+    message = input("No hay datos para mostrar.");
 }

@@ -1,31 +1,50 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { CategoryService } from '../../../core/services/category.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Category } from '../../../core/models/category.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { ActivatedRoute, RouterLink } from "@angular/router";
+import { DatePipe } from "@angular/common";
+import { CategoryService } from "../../../core/services/category.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Category } from "../../../core/models/category.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { extractErrorMessage } from "../../../core/utils/error.util";
 
 @Component({
-    selector: 'app-category-detail',
+    selector: "app-category-detail",
     standalone: true,
-    imports: [RouterLink, DatePipe, PageHeaderComponent, LoadingSpinnerComponent],
+    imports: [
+        RouterLink,
+        DatePipe,
+        PageHeaderComponent,
+        LoadingSpinnerComponent,
+    ],
     template: `
         <app-page-header title="Detalle de categoría">
-            <a [routerLink]="['/admin/categorias', id, 'editar']" class="btn">Editar</a>
-            <a routerLink="/admin/categorias" class="btn btn-secondary">Volver</a>
+            <a [routerLink]="['/admin/categorias', id, 'editar']" class="btn"
+                >Editar</a
+            >
+            <a routerLink="/admin/categorias" class="btn btn-secondary"
+                >Volver</a
+            >
         </app-page-header>
 
         @if (loading()) {
             <app-loading-spinner />
         } @else if (item(); as cat) {
             <div class="glass-card detail-grid">
-                <div class="detail-row"><span class="label">ID</span><span>{{ cat.id }}</span></div>
-                <div class="detail-row"><span class="label">Nombre</span><span>{{ cat.name }}</span></div>
-                <div class="detail-row"><span class="label">Descripción</span><span>{{ cat.description || '—' }}</span></div>
-                <div class="detail-row"><span class="label">Creado</span><span>{{ cat.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span></div>
+                <div class="detail-row">
+                    <span class="label">ID</span><span>{{ cat.id }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Nombre</span><span>{{ cat.name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Descripción</span
+                    ><span>{{ cat.description || "—" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Creado</span
+                    ><span>{{ cat.createdAt | date: "dd/MM/yyyy HH:mm" }}</span>
+                </div>
             </div>
         }
     `,
@@ -47,7 +66,7 @@ export class CategoryDetailComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly toast = inject(ToastService);
 
-    id = Number(this.route.snapshot.paramMap.get('id'));
+    id = Number(this.route.snapshot.paramMap.get("id"));
     loading = signal(true);
     item = signal<Category | null>(null);
 
@@ -58,7 +77,9 @@ export class CategoryDetailComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'No se pudo cargar la categoría.'));
+                this.toast.error(
+                    extractErrorMessage(err, "No se pudo cargar la categoría."),
+                );
                 this.loading.set(false);
             },
         });

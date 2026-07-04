@@ -1,35 +1,66 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { SupplierService } from '../../../core/services/supplier.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Supplier } from '../../../core/models/supplier.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { ActivatedRoute, RouterLink } from "@angular/router";
+import { DatePipe } from "@angular/common";
+import { SupplierService } from "../../../core/services/supplier.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Supplier } from "../../../core/models/supplier.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { extractErrorMessage } from "../../../core/utils/error.util";
 
 @Component({
-    selector: 'app-supplier-detail',
+    selector: "app-supplier-detail",
     standalone: true,
-    imports: [RouterLink, DatePipe, PageHeaderComponent, LoadingSpinnerComponent],
+    imports: [
+        RouterLink,
+        DatePipe,
+        PageHeaderComponent,
+        LoadingSpinnerComponent,
+    ],
     template: `
         <app-page-header title="Detalle de proveedor">
-            <a [routerLink]="['/admin/proveedores', id, 'editar']" class="btn">Editar</a>
-            <a routerLink="/admin/proveedores" class="btn btn-secondary">Volver</a>
+            <a [routerLink]="['/admin/proveedores', id, 'editar']" class="btn"
+                >Editar</a
+            >
+            <a routerLink="/admin/proveedores" class="btn btn-secondary"
+                >Volver</a
+            >
         </app-page-header>
 
         @if (loading()) {
             <app-loading-spinner />
         } @else if (item(); as s) {
             <div class="glass-card">
-                <div class="detail-row"><span class="label">ID</span><span>{{ s.id }}</span></div>
-                <div class="detail-row"><span class="label">RUC</span><span>{{ s.ruc }}</span></div>
-                <div class="detail-row"><span class="label">Razón social</span><span>{{ s.company_name }}</span></div>
-                <div class="detail-row"><span class="label">Contacto</span><span>{{ s.contact_name || '—' }}</span></div>
-                <div class="detail-row"><span class="label">Teléfono</span><span>{{ s.phone || '—' }}</span></div>
-                <div class="detail-row"><span class="label">Email</span><span>{{ s.email || '—' }}</span></div>
-                <div class="detail-row"><span class="label">Tiempo de entrega</span><span>{{ s.delivery_time_days }} días</span></div>
-                <div class="detail-row"><span class="label">Creado</span><span>{{ s.created_at | date: 'dd/MM/yyyy HH:mm' }}</span></div>
+                <div class="detail-row">
+                    <span class="label">ID</span><span>{{ s.id }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">RUC</span><span>{{ s.ruc }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Razón social</span
+                    ><span>{{ s.company_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Contacto</span
+                    ><span>{{ s.contact_name || "—" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Teléfono</span
+                    ><span>{{ s.phone || "—" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Email</span
+                    ><span>{{ s.email || "—" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Tiempo de entrega</span
+                    ><span>{{ s.delivery_time_days }} días</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Creado</span
+                    ><span>{{ s.created_at | date: "dd/MM/yyyy HH:mm" }}</span>
+                </div>
             </div>
         }
     `,
@@ -40,7 +71,10 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
             padding: 0.75rem 0;
             border-bottom: 1px solid var(--color-border);
         }
-        .label { color: var(--color-text-secondary); font-weight: 600; }
+        .label {
+            color: var(--color-text-secondary);
+            font-weight: 600;
+        }
     `,
 })
 export class SupplierDetailComponent implements OnInit {
@@ -48,7 +82,7 @@ export class SupplierDetailComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly toast = inject(ToastService);
 
-    id = Number(this.route.snapshot.paramMap.get('id'));
+    id = Number(this.route.snapshot.paramMap.get("id"));
     loading = signal(true);
     item = signal<Supplier | null>(null);
 
@@ -59,7 +93,9 @@ export class SupplierDetailComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'No se pudo cargar el proveedor.'));
+                this.toast.error(
+                    extractErrorMessage(err, "No se pudo cargar el proveedor."),
+                );
                 this.loading.set(false);
             },
         });

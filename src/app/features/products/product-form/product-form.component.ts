@@ -1,25 +1,34 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { ProductService } from '../../../core/services/product.service';
-import { CategoryService } from '../../../core/services/category.service';
-import { LocationService } from '../../../core/services/location.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Category } from '../../../core/models/category.model';
-import { Location } from '../../../core/models/location.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { extractErrorMessage } from '../../../core/utils/error.util';
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
+import { forkJoin } from "rxjs";
+import { ProductService } from "../../../core/services/product.service";
+import { CategoryService } from "../../../core/services/category.service";
+import { LocationService } from "../../../core/services/location.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Category } from "../../../core/models/category.model";
+import { Location } from "../../../core/models/location.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { extractErrorMessage } from "../../../core/utils/error.util";
 
 @Component({
-    selector: 'app-product-form',
+    selector: "app-product-form",
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink, PageHeaderComponent, LoadingSpinnerComponent],
+    imports: [
+        ReactiveFormsModule,
+        RouterLink,
+        PageHeaderComponent,
+        LoadingSpinnerComponent,
+    ],
     template: `
         <app-page-header
             [title]="isEdit ? 'Editar producto' : 'Nuevo producto'"
-            [subtitle]="isEdit ? 'Modifica los datos del producto' : 'Registra un nuevo producto'"
+            [subtitle]="
+                isEdit
+                    ? 'Modifica los datos del producto'
+                    : 'Registra un nuevo producto'
+            "
         />
 
         @if (loading()) {
@@ -29,16 +38,28 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="sku">SKU *</label>
-                        <input id="sku" type="text" formControlName="sku" maxlength="50" />
+                        <input
+                            id="sku"
+                            type="text"
+                            formControlName="sku"
+                            maxlength="50"
+                        />
                     </div>
                     <div class="form-group">
                         <label for="name">Nombre *</label>
-                        <input id="name" type="text" formControlName="name" maxlength="150" />
+                        <input
+                            id="name"
+                            type="text"
+                            formControlName="name"
+                            maxlength="150"
+                        />
                     </div>
                     <div class="form-group">
                         <label for="categoryId">Categoría *</label>
                         <select id="categoryId" formControlName="categoryId">
-                            <option [ngValue]="null" disabled>Seleccionar...</option>
+                            <option [ngValue]="null" disabled>
+                                Seleccionar...
+                            </option>
                             @for (c of categories(); track c.id) {
                                 <option [ngValue]="c.id">{{ c.name }}</option>
                             }
@@ -47,35 +68,74 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
                     <div class="form-group">
                         <label for="locationId">Ubicación *</label>
                         <select id="locationId" formControlName="locationId">
-                            <option [ngValue]="null" disabled>Seleccionar...</option>
+                            <option [ngValue]="null" disabled>
+                                Seleccionar...
+                            </option>
                             @for (l of locations(); track l.id) {
-                                <option [ngValue]="l.id">{{ l.aisle }}-{{ l.rack }}-{{ l.level }}</option>
+                                <option [ngValue]="l.id">
+                                    {{ l.aisle }}-{{ l.rack }}-{{ l.level }}
+                                </option>
                             }
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="unit">Unidad *</label>
-                        <input id="unit" type="text" formControlName="unit" maxlength="20" />
+                        <input
+                            id="unit"
+                            type="text"
+                            formControlName="unit"
+                            maxlength="20"
+                        />
                     </div>
                     <div class="form-group">
                         <label for="stock">Stock *</label>
-                        <input id="stock" type="number" formControlName="stock" min="0" step="0.01" />
+                        <input
+                            id="stock"
+                            type="number"
+                            formControlName="stock"
+                            min="0"
+                            step="0.01"
+                        />
                     </div>
                     <div class="form-group">
                         <label for="minStock">Stock mínimo *</label>
-                        <input id="minStock" type="number" formControlName="minStock" min="0" step="0.01" />
+                        <input
+                            id="minStock"
+                            type="number"
+                            formControlName="minStock"
+                            min="0"
+                            step="0.01"
+                        />
                     </div>
                 </div>
                 <div class="form-actions">
-                    <a routerLink="/admin/productos" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn" [disabled]="form.invalid || saving()">
-                        {{ saving() ? 'Guardando...' : isEdit ? 'Actualizar' : 'Crear' }}
+                    <a routerLink="/admin/productos" class="btn btn-secondary"
+                        >Cancelar</a
+                    >
+                    <button
+                        type="submit"
+                        class="btn"
+                        [disabled]="form.invalid || saving()"
+                    >
+                        {{
+                            saving()
+                                ? "Guardando..."
+                                : isEdit
+                                  ? "Actualizar"
+                                  : "Crear"
+                        }}
                     </button>
                 </div>
             </form>
         }
     `,
-    styles: `.form-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }`,
+    styles: `
+        .form-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+    `,
 })
 export class ProductFormComponent implements OnInit {
     private readonly fb = inject(FormBuilder);
@@ -94,17 +154,17 @@ export class ProductFormComponent implements OnInit {
     locations = signal<Location[]>([]);
 
     form = this.fb.group({
-        sku: ['', [Validators.required, Validators.maxLength(50)]],
-        name: ['', [Validators.required, Validators.maxLength(150)]],
+        sku: ["", [Validators.required, Validators.maxLength(50)]],
+        name: ["", [Validators.required, Validators.maxLength(150)]],
         categoryId: [null as number | null, Validators.required],
         locationId: [null as number | null, Validators.required],
-        unit: ['', [Validators.required, Validators.maxLength(20)]],
+        unit: ["", [Validators.required, Validators.maxLength(20)]],
         stock: [0, [Validators.required, Validators.min(0)]],
         minStock: [0, [Validators.required, Validators.min(0)]],
     });
 
     ngOnInit(): void {
-        const idParam = this.route.snapshot.paramMap.get('id');
+        const idParam = this.route.snapshot.paramMap.get("id");
         if (idParam) {
             this.isEdit = true;
             this.editId = Number(idParam);
@@ -123,7 +183,8 @@ export class ProductFormComponent implements OnInit {
                 this.categories.set(results[0] as Category[]);
                 this.locations.set(results[1] as Location[]);
                 if (this.isEdit && results[2]) {
-                    const p = results[2] as import('../../../core/models/product.model').Product;
+                    const p =
+                        results[2] as import("../../../core/models/product.model").Product;
                     this.form.patchValue({
                         sku: p.sku,
                         name: p.name,
@@ -137,7 +198,9 @@ export class ProductFormComponent implements OnInit {
                 this.loading.set(false);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al cargar datos.'));
+                this.toast.error(
+                    extractErrorMessage(err, "Error al cargar datos."),
+                );
                 this.loading.set(false);
             },
         });
@@ -165,11 +228,13 @@ export class ProductFormComponent implements OnInit {
 
         op.subscribe({
             next: () => {
-                this.toast.success(this.isEdit ? 'Producto actualizado.' : 'Producto creado.');
-                this.router.navigate(['/admin/productos']);
+                this.toast.success(
+                    this.isEdit ? "Producto actualizado." : "Producto creado.",
+                );
+                this.router.navigate(["/admin/productos"]);
             },
             error: (err) => {
-                this.toast.error(extractErrorMessage(err, 'Error al guardar.'));
+                this.toast.error(extractErrorMessage(err, "Error al guardar."));
                 this.saving.set(false);
             },
         });

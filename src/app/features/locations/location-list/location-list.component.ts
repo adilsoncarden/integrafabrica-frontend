@@ -1,20 +1,23 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { LocationService } from '../../../core/services/location.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Location } from '../../../core/models/location.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
-import { PaginationNavComponent } from '../../../shared/components/pagination-nav/pagination-nav.component';
-import { extractErrorMessage, shouldSuppressErrorToast } from '../../../core/utils/error.util';
-import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util';
+import { Component, inject, signal } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { DatePipe } from "@angular/common";
+import { LocationService } from "../../../core/services/location.service";
+import { AuthService } from "../../../core/services/auth.service";
+import { ConfirmDialogService } from "../../../core/services/confirm-dialog.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Location } from "../../../core/models/location.model";
+import { PageHeaderComponent } from "../../../shared/components/page-header/page-header.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
+import { EmptyStateComponent } from "../../../shared/components/empty-state/empty-state.component";
+import { PaginationNavComponent } from "../../../shared/components/pagination-nav/pagination-nav.component";
+import {
+    extractErrorMessage,
+    shouldSuppressErrorToast,
+} from "../../../core/utils/error.util";
+import { setupAuthGuardedInitialLoad } from "../../../core/utils/auth-ready.util";
 
 @Component({
-    selector: 'app-location-list',
+    selector: "app-location-list",
     standalone: true,
     imports: [
         RouterLink,
@@ -25,14 +28,21 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
         PaginationNavComponent,
     ],
     template: `
-        <app-page-header title="Ubicaciones" subtitle="Pasillos, estantes y niveles del almacén">
+        <app-page-header
+            title="Ubicaciones"
+            subtitle="Pasillos, estantes y niveles del almacén"
+        >
             <a routerLink="/admin/ubicaciones/nuevo" class="btn">+ Nuevo</a>
         </app-page-header>
 
         @if (loading()) {
             <app-loading-spinner />
         } @else if (totalElements() === 0) {
-            <app-empty-state icon="📍" title="Sin ubicaciones" message="Registra ubicaciones para asignar productos.">
+            <app-empty-state
+                icon="📍"
+                title="Sin ubicaciones"
+                message="Registra ubicaciones para asignar productos."
+            >
                 <a routerLink="/admin/ubicaciones/nuevo" class="btn">+ Nuevo</a>
             </app-empty-state>
         } @else {
@@ -56,12 +66,35 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
                                 <td>{{ item.aisle }}</td>
                                 <td>{{ item.rack }}</td>
                                 <td>{{ item.level }}</td>
-                                <td>{{ item.description || '—' }}</td>
-                                <td>{{ item.createdAt | date: 'dd/MM/yyyy' }}</td>
+                                <td>{{ item.description || "—" }}</td>
+                                <td>
+                                    {{ item.createdAt | date: "dd/MM/yyyy" }}
+                                </td>
                                 <td class="actions">
-                                    <a [routerLink]="['/admin/ubicaciones', item.id]" class="btn-sm btn-secondary">Ver</a>
-                                    <a [routerLink]="['/admin/ubicaciones', item.id, 'editar']" class="btn-sm btn-secondary">Editar</a>
-                                    <button type="button" class="btn-sm btn-danger" (click)="onDelete(item)">Eliminar</button>
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/ubicaciones',
+                                            item.id,
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Ver</a
+                                    >
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/ubicaciones',
+                                            item.id,
+                                            'editar',
+                                        ]"
+                                        class="btn-sm btn-secondary"
+                                        >Editar</a
+                                    >
+                                    <button
+                                        type="button"
+                                        class="btn-sm btn-danger"
+                                        (click)="onDelete(item)"
+                                    >
+                                        Eliminar
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -76,7 +109,13 @@ import { setupAuthGuardedInitialLoad } from '../../../core/utils/auth-ready.util
             </div>
         }
     `,
-    styles: `.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }`,
+    styles: `
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+    `,
 })
 export class LocationListComponent {
     private readonly service = inject(LocationService);
@@ -104,7 +143,12 @@ export class LocationListComponent {
             },
             error: (err) => {
                 if (!shouldSuppressErrorToast(err, this.authService)) {
-                    this.toast.error(extractErrorMessage(err, 'Error al cargar ubicaciones.'));
+                    this.toast.error(
+                        extractErrorMessage(
+                            err,
+                            "Error al cargar ubicaciones.",
+                        ),
+                    );
                 }
                 this.loading.set(false);
             },
@@ -118,19 +162,24 @@ export class LocationListComponent {
 
     async onDelete(item: Location): Promise<void> {
         const confirmed = await this.confirmDialog.confirm({
-            title: 'Eliminar ubicación',
+            title: "Eliminar ubicación",
             message: `¿Eliminar ubicación ${item.aisle}-${item.rack}-${item.level}?`,
             danger: true,
-            confirmLabel: 'Eliminar',
+            confirmLabel: "Eliminar",
         });
         if (!confirmed) return;
 
         this.service.delete(item.id).subscribe({
             next: () => {
-                this.toast.success(`Ubicación ${item.aisle}-${item.rack}-${item.level} eliminada.`);
+                this.toast.success(
+                    `Ubicación ${item.aisle}-${item.rack}-${item.level} eliminada.`,
+                );
                 this.load();
             },
-            error: (err) => this.toast.error(extractErrorMessage(err, 'Error al eliminar.')),
+            error: (err) =>
+                this.toast.error(
+                    extractErrorMessage(err, "Error al eliminar."),
+                ),
         });
     }
 }

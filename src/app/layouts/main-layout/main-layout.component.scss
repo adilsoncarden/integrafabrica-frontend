@@ -36,7 +36,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+        background: linear-gradient(
+            135deg,
+            var(--color-primary),
+            var(--color-accent)
+        );
         border-radius: var(--radius-lg);
         font-size: 1.25rem;
         flex-shrink: 0;
@@ -156,7 +160,9 @@
     padding: 0.25rem;
 
     &.profile-active .profile-avatar {
-        box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-accent);
+        box-shadow:
+            0 0 0 2px var(--color-surface),
+            0 0 0 4px var(--color-accent);
     }
 }
 
@@ -172,7 +178,11 @@
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--color-text-on-primary);
-    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    background: linear-gradient(
+        135deg,
+        var(--color-primary),
+        var(--color-accent)
+    );
     box-shadow: var(--shadow-button);
 }
 
